@@ -15,7 +15,7 @@ namespace Core.Loggers
         /// <summary>
         /// Object to which the message applies.
         /// </summary>
-        private UnityEngine.Object _unityContext;
+        private readonly UnityEngine.Object _unityContext;
 
         /// <summary>
         /// Used to identify the source of a log message. It usually identifies the class where the log call occurs.

@@ -10,7 +10,7 @@ namespace Core.Containers
         /* ----------------------------------------------------------------------------  */
         /*                                  PROPERTIES                                   */
         /* ----------------------------------------------------------------------------  */
-        private Dictionary<Type, TypeFactory> _types = new Dictionary<Type, TypeFactory>();
+        private readonly Dictionary<Type, TypeFactory> _types = new();
 
         /* ----------------------------------------------------------------------------  */
         /*                                PUBLIC METHODS                                 */
@@ -33,10 +33,9 @@ namespace Core.Containers
 
         internal bool TryResolve(Type type, out object result)
         {
-            TypeFactory iocFactory;
 
             //Try and get specific type
-            if (!_types.TryGetValue(type, out iocFactory))
+            if (!_types.TryGetValue(type, out TypeFactory iocFactory))
             { }
 
             //Try and get derived type
@@ -44,7 +43,7 @@ namespace Core.Containers
             {
                 foreach (KeyValuePair<Type, TypeFactory> pair in _types)
                 {
-                    var interfaces = pair.Key.GetInterfaces();
+                    Type[] interfaces = pair.Key.GetInterfaces();
                     if (interfaces.Contains(type))
                     {
                         iocFactory = pair.Value;
@@ -61,8 +60,7 @@ namespace Core.Containers
 
         internal object Resolve(Type type)
         {
-            object result;
-            bool success = TryResolve(type, out result);
+            bool success = TryResolve(type, out object result);
 
             if (!success)
                 throw new Exception($"{type.Name} not found in container");
@@ -87,9 +85,9 @@ namespace Core.Containers
             private readonly Func<IContainer, object> _factory;
             private readonly Container _container;
 
-            private bool _isSingleton = false;
+            private readonly bool _isSingleton = false;
             private object _instance;
-            private object _theLock = new object();
+            private readonly object _theLock = new();
 
             public TypeFactory(Type type, Func<IContainer, object> factory, Container container, bool isSingleton = false)
             {
@@ -138,8 +136,7 @@ namespace Core.Containers
                     //Resolve stuff
                     foreach (ParameterInfo parameterInfo in parametersInfo)
                     {
-                        object result;
-                        _container.TryResolve(parameterInfo.ParameterType, out result);
+                        _container.TryResolve(parameterInfo.ParameterType, out object result);
                         parameters.Add(result);
                     }
 

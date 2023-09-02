@@ -5,7 +5,7 @@ namespace Core.Containers
 {
     public class ContainerBuilder
     {
-        private Dictionary<Type, TypeToRegisterWrapper> typesToRegister = new Dictionary<Type, TypeToRegisterWrapper>();
+        private readonly Dictionary<Type, TypeToRegisterWrapper> typesToRegister = new();
 
         /* ----------------------------------------------------------------------------  */
         /*                                PUBLIC METHODS                                 */
@@ -24,7 +24,7 @@ namespace Core.Containers
 
         public IContainer Build()
         {
-            Container container = new Container();
+            Container container = new();
 
             foreach (KeyValuePair<Type, TypeToRegisterWrapper> types in typesToRegister)
             {

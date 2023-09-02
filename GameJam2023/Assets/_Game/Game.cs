@@ -1,6 +1,7 @@
 using Core.Containers;
 using Core.Loggers;
 using Core.Mediators;
+using Core.StorageServices;
 using System;
 using UnityEngine;
 
@@ -27,10 +28,11 @@ public class Game
     {
         Debug.Log("Bootstrap");
 
-        ContainerBuilder containerBuilder = new ContainerBuilder();
+        ContainerBuilder containerBuilder = new();
 
         containerBuilder.Register<ILoggerFactory, LoggerFactory>();
         containerBuilder.RegisterSingleton<IMessenger, Messenger>();
+        containerBuilder.RegisterSingleton<IStorageService, StorageService>();
 
         Container = containerBuilder.Build();
     }

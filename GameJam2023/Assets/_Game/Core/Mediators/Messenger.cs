@@ -7,7 +7,7 @@ namespace Core.Mediators
     public class Messenger : IMessenger
     {
         private readonly IDictionary<Type, IDictionary<Guid, ISubscription>> _subscriptions = new Dictionary<Type, IDictionary<Guid, ISubscription>>();
-        private readonly object _theLock = new object();
+        private readonly object _theLock = new();
 
         /* ----------------------------------------------------------------------------  */
         /*                                PUBLIC METHODS                                 */
@@ -23,8 +23,7 @@ namespace Core.Mediators
 
             lock (_theLock)
             {
-                IDictionary<Guid, ISubscription> messageSubscriptions;
-                if (_subscriptions.TryGetValue(messageType, out messageSubscriptions))
+                if (_subscriptions.TryGetValue(messageType, out IDictionary<Guid, ISubscription> messageSubscriptions))
                 {
                     toNotify = messageSubscriptions.Values.ToList();
                 }
@@ -48,8 +47,7 @@ namespace Core.Mediators
             //Add the subscription to the subscribers
             lock (_theLock)
             {
-                IDictionary<Guid, ISubscription> messageSubscriptions;
-                if (!_subscriptions.TryGetValue(messageType, out messageSubscriptions))
+                if (!_subscriptions.TryGetValue(messageType, out IDictionary<Guid, ISubscription> messageSubscriptions))
                 {
                     messageSubscriptions = new Dictionary<Guid, ISubscription>();
                     _subscriptions[messageType] = messageSubscriptions;
@@ -72,9 +70,8 @@ namespace Core.Mediators
         {
             lock (_theLock)
             {
-                IDictionary<Guid, ISubscription> messageSubscriptions;
 
-                if (_subscriptions.TryGetValue(messageType, out messageSubscriptions))
+                if (_subscriptions.TryGetValue(messageType, out IDictionary<Guid, ISubscription> messageSubscriptions))
                 {
                     if (messageSubscriptions.ContainsKey(subscriptionTokenId))
                     {
