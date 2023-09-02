@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/_Game/Scenes/03a Win Scene.unity
     guid: c03993ebd11e7ab468d6158c03174767
   - enabled: 1
-    path: Assets/_Game/Scenes/03b Loose Scene.unity
+    path: Assets/_Game/Scenes/03b Lose Scene.unity
     guid: 495cd3e5d1809bd4fa723f00ccfafa11
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
