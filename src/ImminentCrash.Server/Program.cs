@@ -23,11 +23,11 @@ services.AddCors(policy =>
     );
 });
 
-string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrWhiteSpace(connectionString))
-    throw new ApplicationException($"{nameof(connectionString)} is required");
+//string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//if (string.IsNullOrWhiteSpace(connectionString))
+//    throw new ApplicationException($"{nameof(connectionString)} is required");
 
-services.AddInfrastructure(connectionString, builder.Environment.IsDevelopment());
+//services.AddInfrastructure(connectionString, builder.Environment.IsDevelopment());
 
 // GRPC
 services.AddCodeFirstGrpc(config =>
@@ -38,7 +38,7 @@ services.AddCodeFirstGrpcReflection();
 
 var app = builder.Build();
 
-await app.UseInfrastructureAsync();
+//await app.UseInfrastructureAsync();
 
 app.UseHttpsRedirection();
 app.UseCors();
