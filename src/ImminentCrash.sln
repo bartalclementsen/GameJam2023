@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34004.107
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{748F9135-0286-417F-946E-9D8094653DD6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DC3ACDCF-945A-4062-8F96-57AF5B975476}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImminentCrash.Server", "ImminentCrash.Server\ImminentCrash.Server.csproj", "{D13C4DC3-F828-4288-AFCC-5F3F9F7EE5B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImminentCrash.Client", "ImminentCrash.Client\ImminentCrash.Client.csproj", "{29378847-BA43-46B2-9501-894A7B065720}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImminentCrash.Contracts", "ImminentCrash.Contracts\ImminentCrash.Contracts.csproj", "{16554219-B46D-4720-9508-1E8862076471}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImminentCrash.Infrastructure", "ImminentCrash.Infrastructure\ImminentCrash.Infrastructure.csproj", "{3371CF08-30A3-4C45-BA13-9A5822EF8CC9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D13C4DC3-F828-4288-AFCC-5F3F9F7EE5B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D13C4DC3-F828-4288-AFCC-5F3F9F7EE5B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D13C4DC3-F828-4288-AFCC-5F3F9F7EE5B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D13C4DC3-F828-4288-AFCC-5F3F9F7EE5B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29378847-BA43-46B2-9501-894A7B065720}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29378847-BA43-46B2-9501-894A7B065720}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29378847-BA43-46B2-9501-894A7B065720}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29378847-BA43-46B2-9501-894A7B065720}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16554219-B46D-4720-9508-1E8862076471}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16554219-B46D-4720-9508-1E8862076471}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16554219-B46D-4720-9508-1E8862076471}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16554219-B46D-4720-9508-1E8862076471}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3371CF08-30A3-4C45-BA13-9A5822EF8CC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3371CF08-30A3-4C45-BA13-9A5822EF8CC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3371CF08-30A3-4C45-BA13-9A5822EF8CC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3371CF08-30A3-4C45-BA13-9A5822EF8CC9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D13C4DC3-F828-4288-AFCC-5F3F9F7EE5B7} = {748F9135-0286-417F-946E-9D8094653DD6}
+		{29378847-BA43-46B2-9501-894A7B065720} = {748F9135-0286-417F-946E-9D8094653DD6}
+		{16554219-B46D-4720-9508-1E8862076471} = {748F9135-0286-417F-946E-9D8094653DD6}
+		{3371CF08-30A3-4C45-BA13-9A5822EF8CC9} = {748F9135-0286-417F-946E-9D8094653DD6}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5EEAE979-68B4-41DC-B9E2-D7AA6F69B3D4}
+	EndGlobalSection
+EndGlobal
