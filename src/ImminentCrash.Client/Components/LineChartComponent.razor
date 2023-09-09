@@ -40,6 +40,9 @@
             }
         };
 
+        // Add ur line :)
+        AddArbitraryLine();
+
         // test seed data
         AddDataSet(CoinType.Bitcoin, new List<object>());
         AddDataSet(CoinType.Etherium, new List<object>());
@@ -56,6 +59,9 @@
     /* Public */
     public void Tick()
     {
+        if (chartReady is not true)
+            return;
+
         // Increment our current date
         CurrentDate = CurrentDate.AddDays(1);
         chartJsConfig.SetLabels(BuildDays(CurrentDate));
@@ -74,6 +80,7 @@
                 chartData[dataset] = new SetDataObject(lineDataSet.Data);
             }
         }
+
         chartJsConfig.SetData(chartData);
         chartJsConfig.ReinitializeChart();
     }
@@ -81,11 +88,11 @@
     public void AddDataSet(CoinType coinType, List<object> dataSet)
     {
         chartJsConfig.Data.Datasets.Add(new LineDataset()
-            {
-                Label = CoinTypeToString(coinType),
-                Data = dataSet,
-                PointStyle = new IndexableOption<string>(GetPointStyle(coinType, dataSet))
-            });
+        {
+            Label = CoinTypeToString(coinType),
+            Data = dataSet,
+            PointStyle = new IndexableOption<string>(GetPointStyle(coinType, dataSet))
+        });
     }
 
     public void AddNewData(CoinType coinType, decimal dataEntry)
@@ -101,6 +108,28 @@
     }
 
     /* Private */
+    public void AddArbitraryLine()
+    {
+        if (chartJsConfig.Options == null)
+            chartJsConfig.Options = new();
+
+        if (chartJsConfig.Options.Plugins == null)
+            chartJsConfig.Options.Plugins = new();
+
+        chartJsConfig.Options.Plugins.ArbitraryLines = new List<ArbitraryLineConfig>()
+        {
+            new ArbitraryLineConfig()
+            {
+                ArbitraryLineColor = "black",
+                XPosition = _daysToSeeInThePast,
+                XWidth = 2,
+                Text = "Arbitrary Line"
+            }
+        };
+
+        chartJsConfig.UpdateChartOptions();
+    }
+
     private List<string> BuildDays(DateTime date)
     {
         List<string> days = new();

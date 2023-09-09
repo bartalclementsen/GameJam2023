@@ -7,6 +7,10 @@
 <button @onclick="() => OnPauseGameClicked()">Pause Game</button>
 <button @onclick="() => OnContinueGameClicked()">Continue Game</button>
 
+<div style="position: fixed; display: block;width:76%;height:90%;margin: 0 12%;">
+    <LineChartComponent />
+</div>
+
 <div style="float:left; width: 250px; padding: 16px;">
     <EventOverviewComponent @ref="EventOverviewComponentRef"></EventOverviewComponent>
 </div>
