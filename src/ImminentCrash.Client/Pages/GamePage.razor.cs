@@ -7,6 +7,7 @@ using ImminentCrash.Contracts.Model;
 using Microsoft.Extensions.Logging;
 using Grpc.Core;
 using ImminentCrash.Client.Components;
+using static ImminentCrash.Client.Components.CoinOverviewComponent;
 
 namespace ImminentCrash.Client.Pages;
 
@@ -20,6 +21,8 @@ public partial class GamePage
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
+    private bool _isDead;
+
     private bool _disposedValue;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -29,6 +32,7 @@ public partial class GamePage
     private LivingCostComponent LivingCostComponentRef = default!;
     private BoosterOverviewComponent BoosterOverviewComponentRef = default!;
     private BalanceComponent BalanceComponentRef = default!;
+    private LineChartComponent LineChartComponentRef = default!;
 
     // Public
     public void Dispose()
@@ -94,7 +98,7 @@ public partial class GamePage
                 {
                     // TODO: Show dead screen
                     Logger.LogInformation("You are dead");
-                    NavigationManager.NavigateTo("/");
+                    //NavigationManager.NavigateTo("/");
                 }
             }
         }
@@ -117,6 +121,13 @@ public partial class GamePage
         LivingCostComponentRef.HandleNewGameEvent(gameEvent);
         BoosterOverviewComponentRef.HandleNewGameEvent(gameEvent);
         BalanceComponentRef.HandleNewGameEvent(gameEvent);
+        LineChartComponentRef.OnGameEvent(gameEvent);
+
+        if(gameEvent.IsDead) 
+        {
+            _isDead = true;
+            StateHasChanged();
+        }
     }
 
     private async void OnQuitGameClicked()
@@ -133,5 +144,30 @@ public partial class GamePage
     private async void OnContinueGameClicked()
     {
         await Client.ContinueGameAsync(new ContinueGameRequest() { SessionId = SessionId }, _cancellationTokenSource.Token);
+    }
+
+    private async void OnBuy(CoinOrder order)
+    {
+        await Client.BuyCoinsAsync(new BuyCoinsRequest
+        {
+            Amount = order.Amount,
+            CoinId = order.CoinId,
+            SessionId = SessionId
+        });
+    }
+
+    private async void OnSell(CoinOrder order)
+    {
+        await Client.SellCoinsAsync(new SellCoinRequest
+        {
+            Amount = order.Amount,
+            CoinId = order.CoinId,
+            SessionId = SessionId
+        });
+    }
+
+    private void OnBackToMainMenuClicked()
+    {
+        NavigationManager.NavigateTo("/");
     }
 }

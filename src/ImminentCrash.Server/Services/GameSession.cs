@@ -15,6 +15,10 @@ namespace ImminentCrash.Server.Services
         Task QuitGameAsync(CancellationToken cancellationToken);
 
         IAsyncEnumerable<GameEvent> RunAsync(CancellationToken cancellationToken = default);
+
+        Task SellCoinsAsync(SellCoinRequest request, CancellationToken cancellationToken);
+
+        Task BuyCoinsAsync(BuyCoinsRequest request, CancellationToken cancellationToken);
     }
 
     public class GameSession : IGameSession
@@ -27,16 +31,20 @@ namespace ImminentCrash.Server.Services
         private DateOnly _endDate;
         private DateOnly _currentDate;
         private bool _isPaused = false;
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private CancellationTokenSource _cancellationTokenSource = new();
 
-        private readonly PeriodicTimer _periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        private readonly Dictionary<int, int> _coinOwnage = new();
+        private readonly List<CoinBuyOrder> _coinBuyOrders = new();
+        private readonly List<CoinSellOrder> _coinSellOrders = new();
+
+        private readonly PeriodicTimer _periodicTimer = new(TimeSpan.FromSeconds(1));
         private readonly GameSessionState _gameSessionState;
         private readonly ILogger<GameSession> _logger;
 
         private GameEvent? _previousEvent;
-        private Dictionary<DateOnly, GameEvent> _events = new Dictionary<DateOnly, GameEvent>();
+        private readonly Dictionary<DateOnly, GameEvent> _events = new();
 
-        private List<LivingCost> livingCosts = new List<LivingCost>();
+        private readonly List<LivingCost> livingCosts = new();
 
         // Constructor
         public GameSession(ILogger<GameSession> logger)
@@ -46,7 +54,7 @@ namespace ImminentCrash.Server.Services
             Id = Guid.NewGuid();
             _gameSessionState = new GameSessionState
             {
-                CurrentBalance = 1000,
+                CurrentBalance = 50000,
             };
         }
 
@@ -66,11 +74,54 @@ namespace ImminentCrash.Server.Services
 
             while (!_cancellationTokenSource.Token.IsCancellationRequested && await _periodicTimer.WaitForNextTickAsync(_cancellationTokenSource.Token))
             {
-                await Task.Delay(TimeSpan.FromSeconds(1), _cancellationTokenSource.Token);
                 if (_isPaused)
                 {
                     // Skip this tick
                     continue;
+                }
+
+                List<BalanceMovement> balanceMovement = new();
+                List<LivingCost> newLivingCosts = new();
+                List<CoinMovement> coinMovements = new();
+                List<Contracts.Model.Coin> newCoins = new();
+
+                // Apply By Order from previous Day
+                List<CoinSellOrder> sellOrders = _coinSellOrders.ToList();
+                _coinSellOrders.Clear();
+                foreach (CoinSellOrder? sellOrder in sellOrders)
+                {
+                    if (_coinOwnage.ContainsKey(sellOrder.CoinMovement.Id) == false || _coinOwnage[sellOrder.CoinMovement.Id] < sellOrder.Amount)
+                    {
+                        continue;
+                    }
+
+                    decimal price = sellOrder.CoinMovement.Amount * sellOrder.Amount;
+                    _coinOwnage[sellOrder.CoinMovement.Id] -= sellOrder.Amount;
+
+                    balanceMovement.Add(new BalanceMovement
+                    {
+                        Amount = price,
+                        Name = ""
+                    });
+                }
+
+
+                List<CoinBuyOrder> buyOrders = _coinBuyOrders.ToList();
+                _coinBuyOrders.Clear();
+
+                foreach (CoinBuyOrder buyOrder in buyOrders)
+                {
+                    if (_coinOwnage.ContainsKey(buyOrder.CoinMovement.Id) == false)
+                    {
+                        _coinOwnage.Add(buyOrder.CoinMovement.Id, 0);
+                    }
+                    _coinOwnage[buyOrder.CoinMovement.Id] += buyOrder.Amount;
+
+                    balanceMovement.Add(new BalanceMovement
+                    {
+                        Amount = buyOrder.Price * -1,
+                        Name = ""
+                    });
                 }
 
                 // Apply tick
@@ -78,26 +129,20 @@ namespace ImminentCrash.Server.Services
                 _currentDate = _currentDate.AddDays(1);
 
                 // Get living costs
-                LivingCost livingCost = new LivingCost()
+                LivingCost livingCost = new()
                 {
                     Amount = 20,
                     LivingCostType = LivingCostType.Daily,
                     Name = "Living Costs"
                 };
 
-                List<LivingCost> newLivingCosts = new List<LivingCost>();
                 if (livingCosts.Contains(livingCost) == false)
                 {
                     newLivingCosts.Add(livingCost);
                     livingCosts.Add(livingCost);
                 }
 
-
-
                 // Generate costs for tick
-
-
-                List<BalanceMovement> balanceMovement = new List<BalanceMovement>();
                 balanceMovement.Add(new BalanceMovement()
                 {
                     Amount = livingCost.Amount * -1,
@@ -108,8 +153,6 @@ namespace ImminentCrash.Server.Services
                 _gameSessionState.CurrentBalance += balanceMovement.Sum(o => o.Amount);
 
                 // Generate Coin Movements
-                List<CoinMovement> coinMovements = new List<CoinMovement>();
-                List<Contracts.Model.Coin> newCoins = new List<Contracts.Model.Coin>();
                 //List<Contracts.Model.Coin> RemoveCoins = new List<Contracts.Model.Coin>();
 
                 if (_coinDataByDate.TryGetValue(_currentDate, out CoinData? coinData))
@@ -273,12 +316,13 @@ namespace ImminentCrash.Server.Services
                     }
                 }
 
-                GameEvent gameEvent = new GameEvent
+                
+                GameEvent gameEvent = new()
                 {
                     IsDead = _gameSessionState.IsDead,
                     CurrentBalance = _gameSessionState.CurrentBalance,
                     BalanceMovements = balanceMovement,
-                    CurrentDateString = _currentDate.ToString(),
+                    CurrentDateString = _currentDate.ToString("dd.MM.yyyy"),
                     CoinMovements = coinMovements.Any() ? coinMovements : null,
                     NewCoins = newCoins.Any() ? newCoins : null,
                     RemoveCoins = null,
@@ -443,6 +487,47 @@ namespace ImminentCrash.Server.Services
             return Task.FromResult(keyValuePairs.OrderByDescending(kvp => kvp.Value).First().Key);
         }
 
+        public Task SellCoinsAsync(SellCoinRequest request, CancellationToken cancellationToken)
+        {
+            if (_previousEvent == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            CoinMovement? coinMovement = _previousEvent.CoinMovements?.FirstOrDefault(cm => cm.Id == request.CoinId);
+
+            if (coinMovement == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            _coinSellOrders.Add(new CoinSellOrder(coinMovement, request.Amount));
+            return Task.CompletedTask;
+        }
+
+        public Task BuyCoinsAsync(BuyCoinsRequest request, CancellationToken cancellationToken)
+        {
+            if (_previousEvent == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            CoinMovement? coinMovement = _previousEvent.CoinMovements?.FirstOrDefault(cm => cm.Id == request.CoinId);
+
+            if (coinMovement == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            decimal price = coinMovement.Amount * request.Amount;
+            _coinBuyOrders.Add(new CoinBuyOrder(coinMovement, request.Amount, price));
+
+            return Task.CompletedTask;
+        }
+
+        public record CoinBuyOrder(CoinMovement CoinMovement, int Amount, decimal Price);
+
+        public record CoinSellOrder(CoinMovement CoinMovement, int Amount);
 
     }
 

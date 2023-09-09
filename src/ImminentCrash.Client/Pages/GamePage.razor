@@ -7,12 +7,16 @@
 <button @onclick="() => OnPauseGameClicked()">Pause Game</button>
 <button @onclick="() => OnContinueGameClicked()">Continue Game</button>
 
+<div style="position: fixed; display: block;width:76%;height:90%;margin: 0 12%;">
+    <LineChartComponent @ref="LineChartComponentRef" />
+</div>
+
 <div style="float:left; width: 250px; padding: 16px;">
     <EventOverviewComponent @ref="EventOverviewComponentRef"></EventOverviewComponent>
 </div>
 
 <div style="float:right; width: 300px; padding: 16px; margin-right: 16px; height: 750px; overflow-x: hidden; overflow-y: auto;">
-    <CoinOverviewComponent @ref="CoinOverviewComponentRef"></CoinOverviewComponent>
+    <CoinOverviewComponent @ref="CoinOverviewComponentRef" OnBuy="OnBuy" OnSell="OnSell"></CoinOverviewComponent>
 </div>
 
 <div style="bottom: 0; left: 0px; position: fixed; padding: 16px; display: flex;">
@@ -22,4 +26,11 @@
 
 <div style="bottom: 0; right: 0px; position: fixed; padding: 16px;">
     <BalanceComponent @ref="BalanceComponentRef"></BalanceComponent>
+</div>
+
+<div class="death-dialog" style="display:@(_isDead ? "flex" : "none");">
+    <div class="death-dialog__window">
+        <h1 style="margin-bottom:20px;">You died</h1>
+        <button @onclick="() => OnBackToMainMenuClicked()">Back to main menu</button>
+    </div>
 </div>

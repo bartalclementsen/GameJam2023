@@ -21,5 +21,11 @@ namespace ImminentCrash.Contracts
 
         [OperationContract]
         Task<QuitGameResponse> QuitGameAsync(QuitGameRequest request, CallContext context = default);
+
+        [OperationContract]
+        Task<BuyCoinsResponse> BuyCoinsAsync(BuyCoinsRequest request, CallContext context = default);
+
+        [OperationContract]
+        Task<SellCoinsResponse> SellCoinsAsync(SellCoinRequest request, CallContext context = default);
     }
 }

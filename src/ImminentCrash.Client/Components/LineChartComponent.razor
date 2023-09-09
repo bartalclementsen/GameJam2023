@@ -5,12 +5,6 @@
 <ChartComponent ChartJsConfig="chartJsConfig"
                 OnEventTriggered="ChartEventTriggered">
 </ChartComponent>
-
-@if(chartReady is true)
-{
-    <button @onclick="@((e) => StartTick())">Start ticking random data</button>
-    <button @onclick="@((e) => StopTicking())">Stop ticking random data</button>
-}
 @code {
     /* Fields */
     ChartJsConfig chartJsConfig = default!;
@@ -18,7 +12,7 @@
 
     private int _daysToSeeInThePast = 50;
     private int _daysToSeeInTheFuture = 20;
-    private DateTime CurrentDate = DateTime.Now;
+    private DateOnly CurrentDate = default!;
 
     /* Properties */
     private int TotalDaysOnChart { get => _daysToSeeInThePast + _daysToSeeInTheFuture + 1; }
@@ -31,34 +25,70 @@
             Type = ChartType.line,
             Data = new ChartJsData()
             {
-                Labels = BuildDays(CurrentDate),
+                Labels = new List<string>(),
                 Datasets = new List<ChartJsDataset>()
             },
             Options = new()
             {
-                Animation = false
+                Animation = false,
+                Scales = new ChartJsOptionsScales()
+                {
+                    X = new ChartJsAxis()
+                    {
+                        Display = true
+                    },
+                    Y = new ChartJsAxis()
+                    {
+                        Display = true,
+                        Type = "logarithmic"
+                    }
+                }
             }
         };
 
-        // test seed data
-        AddDataSet(CoinType.Bitcoin, new List<object>());
-        AddDataSet(CoinType.Etherium, new List<object>());
-
-        Enumerable.Range(0, _daysToSeeInThePast + 1).ToList().ForEach(e =>
-        {
-            AddNewRandomData(CoinType.Bitcoin);
-            AddNewRandomData(CoinType.Etherium);
-        });
+        // Add ur line :)
+        AddArbitraryLine();
 
         base.OnInitialized();
     }
 
     /* Public */
-    public void Tick()
+    public void OnGameEvent(GameEvent gameEvent)
     {
-        // Increment our current date
-        CurrentDate = CurrentDate.AddDays(1);
-        chartJsConfig.SetLabels(BuildDays(CurrentDate));
+        CurrentDate = DateOnly.ParseExact(gameEvent.CurrentDateString, "dd.MM.yyyy");
+
+        if (gameEvent.NewCoins?.Any() is true)
+        {
+            foreach (Coin coin in gameEvent.NewCoins)
+            {
+                AddCoin((CoinType)coin.Id);
+            }
+        }
+
+        if (gameEvent.CoinMovements?.Any() is true)
+        {
+            foreach (CoinMovement coinMovement in gameEvent.CoinMovements)
+            {
+                AddCoinData((CoinType)coinMovement.Id, coinMovement.Amount);
+            }
+        }
+
+        if (gameEvent.RemoveCoins?.Any() is true)
+        {
+            foreach (Coin removeCoin in gameEvent.RemoveCoins)
+            {
+                RemoveCoin((CoinType)removeCoin.Id);
+            }
+        }
+
+        Tick();
+    }
+
+    /* Private */
+    private void Tick()
+    {
+        if (chartReady is not true)
+            return;
 
         Dictionary<ChartJsDataset, SetDataObject> chartData = new();
         foreach (var dataset in chartJsConfig.Data.Datasets)
@@ -74,21 +104,40 @@
                 chartData[dataset] = new SetDataObject(lineDataSet.Data);
             }
         }
+
+        // Update our Chart labels
+        chartJsConfig.SetLabels(BuildDays(CurrentDate));
+
+        // Update our Chart data
         chartJsConfig.SetData(chartData);
+
         chartJsConfig.ReinitializeChart();
     }
 
-    public void AddDataSet(CoinType coinType, List<object> dataSet)
+    private void AddCoin(CoinType coinType)
     {
+        var emptyData = Enumerable.Range(0, _daysToSeeInThePast)
+            .Select(e => 0m)
+            .Cast<object>()
+            .ToList();
+
         chartJsConfig.Data.Datasets.Add(new LineDataset()
-            {
-                Label = CoinTypeToString(coinType),
-                Data = dataSet,
-                PointStyle = new IndexableOption<string>(GetPointStyle(coinType, dataSet))
-            });
+        {
+            Label = CoinTypeToString(coinType),
+            Data = emptyData
+        });
     }
 
-    public void AddNewData(CoinType coinType, decimal dataEntry)
+    private void RemoveCoin(CoinType coinType)
+    {
+        var coinToRemove = chartJsConfig.Data.Datasets.FirstOrDefault(e => e.Type == ChartType.line && ((LineDataset)e).Label == CoinTypeToString(coinType));
+        if (coinToRemove is null)
+            return;
+
+        chartJsConfig.Data.Datasets.Remove(coinToRemove);
+    }
+
+    private void AddCoinData(CoinType coinType, decimal dataEntry)
     {
         foreach (var dataset in chartJsConfig.Data.Datasets)
         {
@@ -100,14 +149,35 @@
         }
     }
 
-    /* Private */
-    private List<string> BuildDays(DateTime date)
+    public void AddArbitraryLine()
+    {
+        if (chartJsConfig.Options == null)
+            chartJsConfig.Options = new();
+
+        if (chartJsConfig.Options.Plugins == null)
+            chartJsConfig.Options.Plugins = new();
+
+        chartJsConfig.Options.Plugins.ArbitraryLines = new List<ArbitraryLineConfig>()
+        {
+            new ArbitraryLineConfig()
+            {
+                ArbitraryLineColor = "black",
+                XPosition = _daysToSeeInThePast,
+                XWidth = 2,
+                Text = "Arbitrary Line"
+            }
+        };
+
+        chartJsConfig.UpdateChartOptions();
+    }
+
+    private List<string> BuildDays(DateOnly date)
     {
         List<string> days = new();
 
         for (int i = _daysToSeeInThePast; i > 0; i--)
         {
-            DateTime offset = date.AddDays(-i);
+            DateOnly offset = date.AddDays(-i);
             days.Add($"{offset.Day}/{offset.Month}");
         }
 
@@ -115,35 +185,11 @@
 
         for (int i = 0; i < _daysToSeeInTheFuture; ++i)
         {
-            DateTime offset = date.AddDays(i);
+            DateOnly offset = date.AddDays(i);
             days.Add($"{offset.Day}/{offset.Month}");
         }
 
         return days;
-    }
-
-    CancellationTokenSource? cancellationTokenSource;
-    private void StopTicking()
-    {
-        cancellationTokenSource?.Cancel();
-    }
-
-    private async Task StartTick()
-    {
-        cancellationTokenSource?.Cancel();
-        cancellationTokenSource?.Dispose();
-        cancellationTokenSource = new CancellationTokenSource();
-        if (chartReady is not true)
-            return;
-
-        PeriodicTimer periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(1000));
-        while (await periodicTimer.WaitForNextTickAsync(cancellationTokenSource.Token))
-        {
-            AddNewRandomData(CoinType.Bitcoin);
-            AddNewRandomData(CoinType.Etherium);
-
-            Tick();
-        }
     }
 
     private List<string> GetPointStyle(CoinType coinType, IList<object> dataset)
@@ -162,22 +208,44 @@
         return ret;
     }
 
-    private void AddNewRandomData(CoinType coinType) => AddNewData(coinType, (decimal)(Random.Shared.NextDouble() * 10d));
-
     private string CoinTypeToString(CoinType type) => type switch {
+        CoinType.BinanceCoin => "Binance Coin",
         CoinType.Bitcoin => "Bitcoin",
-        CoinType.Etherium => "Etherium",
+        CoinType.Cardano => "Cardano",
+        CoinType.Chainlink => "Chainlink",
+        CoinType.CryptoComCoin => "Crypto.com Coin",
         CoinType.DogeCoin => "Doge Coin",
+        CoinType.EOS => "EOS",
+        CoinType.Ethereum => "Ethereum",
+        CoinType.IOTA => "IOTA",
+        CoinType.LiteCoin => "Lite coin",
+        CoinType.Monero => "Monero",
+        CoinType.NEM => "NEM",
+        CoinType.Stellar => "Stellar Lumen",
         CoinType.Tether => "Tether",
-        _ => "Unknown"
+        CoinType.TRON => "TRON",
+        CoinType.XRP => "XRP",
+        _ => throw new NotImplementedException()
     };
 
     private CoinType CoinTypeToEnum(string type) => type switch
     {
+        "Binance Coin" => CoinType.BinanceCoin,
         "Bitcoin" => CoinType.Bitcoin,
-        "Etherium" => CoinType.Etherium ,
-        "Doge Coi" => CoinType.DogeCoin,
+        "Cardano" => CoinType.Cardano,
+        "Chainlink" => CoinType.Chainlink,
+        "Crypto.com Coin" => CoinType.CryptoComCoin,
+        "Doge Coin" => CoinType.DogeCoin,
+        "EOS" => CoinType.EOS,
+        "Ethereum" => CoinType.Ethereum,
+        "IOTA" => CoinType.IOTA,
+        "Lite coin" => CoinType.LiteCoin,
+        "Monero" => CoinType.Monero,
+        "NEM" => CoinType.NEM,
+        "Stellar Lumen" => CoinType.Stellar,
         "Tether" => CoinType.Tether,
+        "TRON" => CoinType.TRON,
+        "XRP" => CoinType.XRP,
         _ => throw new NotImplementedException()
     };
 
