@@ -26,12 +26,14 @@ namespace ImminentCrash.Server.Services
         private Dictionary<Guid, IGameSession> _sessions = new Dictionary<Guid, IGameSession>();
 
         private readonly ILogger<GameService> _logger;
-        private readonly ILoggerFactory _loggerFactory;
+        private readonly Func<GameSession> _gameSessionFactory;
+        private readonly ICoinDataService _coinDataService;
 
-        public GameService(ILoggerFactory loggerFactory)
+        public GameService(ILogger<GameService> logger, Func<GameSession> gameSessionFactory, ICoinDataService coinDataService)
         {
-            _loggerFactory = loggerFactory;
-            _logger = loggerFactory.CreateLogger<GameService>();
+            _logger = logger;
+            _gameSessionFactory = gameSessionFactory;
+            _coinDataService = coinDataService;
         }
 
         public Task<CreateNewGameResponse> CreateNewGameAsync(CreateNewGameRequest request, CallContext cancellationToken)
@@ -39,8 +41,17 @@ namespace ImminentCrash.Server.Services
             _logger.LogInformation($"{nameof(CreateNewGameAsync)} ({request})");
 
             // TODO: Maybe store in db?
-            var gameSession = new GameSession(_loggerFactory.CreateLogger<GameSession>());
+            var gameSession = _gameSessionFactory.Invoke();
             _sessions.Add(gameSession.Id, gameSession);
+
+            var minDate = _coinDataService.GetMinDate();
+            var maxDate = _coinDataService.GetMaxDate();
+            var coinData = _coinDataService.Get(minDate, maxDate);
+
+            gameSession.Initialize(
+                startDate: minDate.AddDays(5),
+                endDate: maxDate,
+                coinData: coinData);
 
             return Task.FromResult(new CreateNewGameResponse
             {
