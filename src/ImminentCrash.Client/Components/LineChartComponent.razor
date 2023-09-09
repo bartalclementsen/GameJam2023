@@ -36,7 +36,19 @@
             },
             Options = new()
             {
-                Animation = false
+                Animation = false,
+                Scales = new ChartJsOptionsScales()
+                {
+                    X = new ChartJsAxis()
+                    {
+                        Display = true
+                    },
+                    Y = new ChartJsAxis()
+                    {
+                        Display = true,
+                        Type = "logarithmic"
+                    }
+                }
             }
         };
 
@@ -46,11 +58,13 @@
         // test seed data
         AddDataSet(CoinType.Bitcoin, new List<object>());
         AddDataSet(CoinType.Etherium, new List<object>());
+        AddDataSet(CoinType.Tether, new List<object>());
 
         Enumerable.Range(0, _daysToSeeInThePast + 1).ToList().ForEach(e =>
         {
             AddNewRandomData(CoinType.Bitcoin);
             AddNewRandomData(CoinType.Etherium);
+            AddNewRandomData(CoinType.Tether);
         });
 
         base.OnInitialized();
@@ -168,8 +182,9 @@
         PeriodicTimer periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(1000));
         while (await periodicTimer.WaitForNextTickAsync(cancellationTokenSource.Token))
         {
-            AddNewRandomData(CoinType.Bitcoin);
+            AddNewRandomData2(CoinType.Bitcoin);
             AddNewRandomData(CoinType.Etherium);
+            AddNewRandomData3(CoinType.Tether);
 
             Tick();
         }
@@ -192,6 +207,8 @@
     }
 
     private void AddNewRandomData(CoinType coinType) => AddNewData(coinType, (decimal)(Random.Shared.NextDouble() * 10d));
+    private void AddNewRandomData2(CoinType coinType) => AddNewData(coinType, (decimal)(Random.Shared.NextDouble() * 15000d));
+    private void AddNewRandomData3(CoinType coinType) => AddNewData(coinType, (decimal)(Random.Shared.NextDouble()));
 
     private string CoinTypeToString(CoinType type) => type switch {
         CoinType.Bitcoin => "Bitcoin",
