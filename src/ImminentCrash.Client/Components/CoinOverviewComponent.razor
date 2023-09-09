@@ -1,0 +1,58 @@
+﻿<h3>Coin overview</h3>
+
+@foreach(Coin coin in Coins)
+{
+    <div style="display: flex; margin-bottom: 16px;">
+        <!-- icon -->
+        <div>
+            <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1.png" style="height: 55px;margin-right: 10px;margin-top: 25px;">
+        </div>
+        <!-- pills -->
+        <div>
+            <div style="margin-bottom: 8px;">
+                <button style="border-radius: 8px; background: white; width: 52px;">+1</button>
+                <button style="border-radius: 8px; background: white; width: 52px;">+10</button>
+                <button style="border-radius: 8px; background: white; width: 52px;">+100</button>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <button style="border-radius: 8px; background: white; width: 52px;">-1</button>
+                <button style="border-radius: 8px; background: white; width: 52px;">-10</button>
+                <button style="border-radius: 8px; background: white; width: 52px;">-100</button>
+            </div>
+            <div style="display: flex;">
+                <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="#@coin.Amount" readonly>
+                <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="$@coin.Value" readonly>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Coin> Coins = new List<Coin>();
+
+    protected override void OnInitialized()
+    {
+        Coins = new List<Coin>()
+        {
+            new Coin(1, "Bitcoin", 10, 15),
+            new Coin(2, "AlphaCoin", 50, 200),
+        };
+    }
+
+
+    public class Coin
+    {
+        public int Id { get; set; } 
+        public string Name { get; set; }
+        public int Amount { get; set; }
+        public int Value { get; set; }
+
+        public Coin(int id, string name, int amount, int value)
+        {
+            Id = id;
+            Name = name;
+            Amount = amount;
+            Value = value;
+        }
+    }
+}
