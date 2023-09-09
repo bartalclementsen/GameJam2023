@@ -6,6 +6,7 @@ using System.IO;
 using ImminentCrash.Contracts.Model;
 using Microsoft.Extensions.Logging;
 using Grpc.Core;
+using ImminentCrash.Client.Components;
 
 namespace ImminentCrash.Client.Pages;
 
@@ -22,6 +23,12 @@ public partial class GamePage
     private bool _disposedValue;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+    private EventOverviewComponent EventOverviewComponentRef = default!;
+    private CoinOverviewComponent CoinOverviewComponentRef = default!;
+    private LivingCostComponent LivingCostComponentRef = default!;
+    private BoosterOverviewComponent BoosterOverviewComponentRef = default!;
+    private BalanceComponent BalanceComponentRef = default!;
 
     // Public
     public void Dispose()
@@ -77,9 +84,11 @@ public partial class GamePage
 
         try
         {
-            await foreach (var gameEvent in stream)
+            await foreach (GameEvent gameEvent in stream)
             {
                 Logger.LogInformation(gameEvent.ToString());
+
+                HandleEvent(gameEvent);
 
                 if (gameEvent.IsDead)
                 {
@@ -99,6 +108,15 @@ public partial class GamePage
             Logger.LogError(ex, "Error handeling Game Event");
             throw;
         }
+    }
+
+    private void HandleEvent(GameEvent gameEvent)
+    {
+        EventOverviewComponentRef.HandleNewGameEvent(gameEvent);
+        CoinOverviewComponentRef.HandleNewGameEvent(gameEvent);
+        LivingCostComponentRef.HandleNewGameEvent(gameEvent);
+        BoosterOverviewComponentRef.HandleNewGameEvent(gameEvent);
+        BalanceComponentRef.HandleNewGameEvent(gameEvent);
     }
 
     private async void OnQuitGameClicked()

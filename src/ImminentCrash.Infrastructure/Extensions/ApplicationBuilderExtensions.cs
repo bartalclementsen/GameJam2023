@@ -11,7 +11,7 @@ public static class ApplicationBuilderExtensions
 {
     public static async Task<IApplicationBuilder> UseInfrastructureAsync(this IApplicationBuilder app, Func<Task>? testDataRunner = null)
     {
-        using var scope = app.ApplicationServices.CreateScope();
+        using IServiceScope scope = app.ApplicationServices.CreateScope();
         ILogger? logger = scope.ServiceProvider.GetService<ILogger>();
 
         try
@@ -28,7 +28,7 @@ public static class ApplicationBuilderExtensions
             logger?.LogDebug("Database configured");
 
             logger?.LogDebug("Seeding database");
-            var seeder = new Seeder();
+            Seeder seeder = new Seeder();
             await seeder.SeedAsync();
             logger?.LogDebug("Database seeded");
 

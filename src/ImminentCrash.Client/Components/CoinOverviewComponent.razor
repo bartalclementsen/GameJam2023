@@ -3,11 +3,9 @@
 @foreach(Coin coin in Coins)
 {
     <div style="display: flex; margin-bottom: 16px;">
-        <!-- icon -->
         <div>
-            <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1.png" style="height: 55px;margin-right: 10px;margin-top: 25px;">
+            <img src="@GetIconLink(coin.Name)" style="height: 55px;margin-right: 10px;margin-top: 25px;">
         </div>
-        <!-- pills -->
         <div>
             <div style="margin-bottom: 8px;">
                 <button style="border-radius: 8px; background: white; width: 52px;">+1</button>
@@ -20,8 +18,8 @@
                 <button style="border-radius: 8px; background: white; width: 52px;">-100</button>
             </div>
             <div style="display: flex;">
-                <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="#@coin.Amount" readonly>
-                <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="$@coin.Value" readonly>
+                <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="#@coin.Id" readonly>
+                <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="$@coin.Name" readonly>
             </div>
         </div>
     </div>
@@ -32,27 +30,50 @@
 
     protected override void OnInitialized()
     {
-        Coins = new List<Coin>()
-        {
-            new Coin(1, "Bitcoin", 10, 15),
-            new Coin(2, "AlphaCoin", 50, 200),
-        };
+        Coins = new List<Coin>();
     }
 
-
-    public class Coin
+    internal void HandleNewGameEvent(GameEvent gameEvent)
     {
-        public int Id { get; set; } 
-        public string Name { get; set; }
-        public int Amount { get; set; }
-        public int Value { get; set; }
-
-        public Coin(int id, string name, int amount, int value)
+        if (gameEvent.NewCoins != null)
         {
-            Id = id;
-            Name = name;
-            Amount = amount;
-            Value = value;
+            foreach (Coin coin in gameEvent.NewCoins)
+            {
+                Coins.Add(coin);
+            }
         }
+
+        if (gameEvent.RemoveCoins != null)
+        {
+            foreach (Coin coin in gameEvent.RemoveCoins)
+            {
+                Coins.Remove(coin);
+            }
+        }
+        StateHasChanged();
+    }
+
+    private string GetIconLink(string coinName)
+    {
+        return coinName switch
+        {
+            "Binance Coin" => "https://s2.coinmarketcap.com/static/img/coins/64x64/4687.png",
+            "Bitcoin" => "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+            "Cardano" => "https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png",
+            "Chainlink" => "https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png",
+            "Crypto.com Coin" => "https://static.crypto.com/layout/navbar/company-logos/white.png",
+            "Dogecoin" => "https://s2.coinmarketcap.com/static/img/coins/64x64/74.png",
+            "EOS" => "https://s2.coinmarketcap.com/static/img/coins/64x64/1765.png",
+            "Ethereum" => "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+            "IOTA" => "https://s2.coinmarketcap.com/static/img/coins/64x64/1720.png",
+            "Litecoin" => "https://s2.coinmarketcap.com/static/img/coins/64x64/2.png",
+            "Monero" => "https://s2.coinmarketcap.com/static/img/coins/64x64/328.png",
+            "NEM" => "https://s2.coinmarketcap.com/static/img/coins/64x64/873.png",
+            "Stellar" => "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
+            "Tether" => "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
+            "TRON" => "https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png",
+            "XRP" => "https://s2.coinmarketcap.com/static/img/coins/64x64/52.png",
+            _ => "https://s2.coinmarketcap.com/static/cloud/img/dex/default-icon-day.svg?_=937d1f0",
+        };
     }
 }

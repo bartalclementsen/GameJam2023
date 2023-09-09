@@ -1,13 +1,13 @@
 using ImminentCrash.Server.Services;
 using ProtoBuf.Grpc.Server;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Additional configuration is required to successfully run gRPC on macOS.
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
 // Add services to the container.
-var services = builder.Services;
+IServiceCollection services = builder.Services;
 
 
 services.AddSingleton<IGameService, GameService>();
@@ -43,9 +43,9 @@ services.AddCodeFirstGrpc(config =>
 });
 services.AddCodeFirstGrpcReflection();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
-var coinDataService = app.Services.GetRequiredService<ICoinDataService>();
+ICoinDataService coinDataService = app.Services.GetRequiredService<ICoinDataService>();
 await coinDataService.InitializeAsync();
 
 

@@ -1,4 +1,5 @@
 ﻿using ImminentCrash.Contracts;
+using ImminentCrash.Contracts.Model;
 using Microsoft.AspNetCore.Components;
 using System.Reflection;
 
@@ -59,7 +60,7 @@ public partial class Index : IDisposable
     public async void OnStartClicked()
     {
         Logger.LogInformation("Trying to create game");
-        var gameSession = await Client.CreateNewGameAsync(new Contracts.Model.CreateNewGameRequest(), _cancellationTokenSource.Token);
+        CreateNewGameResponse gameSession = await Client.CreateNewGameAsync(new Contracts.Model.CreateNewGameRequest(), _cancellationTokenSource.Token);
 
         Logger.LogInformation("Game created. Navigating to Game Page");
         NavigationManager.NavigateTo("/Game/" + gameSession.SessionId);
