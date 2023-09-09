@@ -4,8 +4,8 @@
     @foreach (LivingCost eventObject in Events)
     {
         <div style="margin-bottom: 16px;">
-            <span>@eventObject.Title:</span>
-            <span>$@eventObject.Cost</span>
+            <span>@eventObject.Name:</span>
+            <span>$@eventObject.Amount</span>
         </div>
     }
 </div>
@@ -15,25 +15,26 @@
 
     protected override void OnInitialized()
     {
-        Events = new List<LivingCost>()
-        {
-            new LivingCost(1, "Rent", 100),
-            new LivingCost(2, "Food", 50),
-        };
+        Events = new List<LivingCost>();
     }
 
-
-    public class LivingCost
+    internal void HandleNewGameEvent(GameEvent gameEvent)
     {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public int Cost { get; set; }
-
-        public LivingCost(int id, string title, int cost)
+        if(gameEvent.NewLivingCosts != null)
         {
-            Id = id;
-            Title = title;
-            Cost = cost;
+            foreach (LivingCost livingCost in gameEvent.NewLivingCosts)
+            {
+                Events.Add(livingCost);
+            }
         }
+
+        if (gameEvent.RemoveLivingCosts != null)
+        {
+            foreach (LivingCost livingCost in gameEvent.RemoveLivingCosts)
+            {
+                Events.Remove(livingCost);
+            }
+        }
+        StateHasChanged();
     }
 }

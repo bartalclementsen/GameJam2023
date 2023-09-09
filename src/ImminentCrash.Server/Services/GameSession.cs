@@ -97,7 +97,7 @@ namespace ImminentCrash.Server.Services
                 // Generate costs for tick
 
 
-                var balanceMovement = new List<BalanceMovement>();
+                List<BalanceMovement> balanceMovement = new List<BalanceMovement>();
                 balanceMovement.Add(new BalanceMovement()
                 {
                     Amount = livingCost.Amount * -1,
@@ -112,7 +112,7 @@ namespace ImminentCrash.Server.Services
                 List<Contracts.Model.Coin> newCoins = new List<Contracts.Model.Coin>();
                 //List<Contracts.Model.Coin> RemoveCoins = new List<Contracts.Model.Coin>();
 
-                if (_coinDataByDate.TryGetValue(_currentDate, out var coinData))
+                if (_coinDataByDate.TryGetValue(_currentDate, out CoinData? coinData))
                 {
                     if (coinData.BinanceCoin != null)
                     {
@@ -260,7 +260,7 @@ namespace ImminentCrash.Server.Services
                     }
                 }
 
-                var gameEvent = new GameEvent
+                GameEvent gameEvent = new GameEvent
                 {
                     IsDead = _gameSessionState.IsDead,
                     CurrentBalance = _gameSessionState.CurrentBalance,

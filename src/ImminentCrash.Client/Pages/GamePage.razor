@@ -8,18 +8,18 @@
 <button @onclick="() => OnContinueGameClicked()">Continue Game</button>
 
 <div style="float:left; width: 250px; padding: 16px;">
-    <EventOverviewComponent></EventOverviewComponent>
+    <EventOverviewComponent @ref="EventOverviewComponentRef"></EventOverviewComponent>
 </div>
 
-<div style="float:right; width: 250px; padding: 16px; margin-right: 16px;">
-    <CoinOverviewComponent></CoinOverviewComponent>
+<div style="float:right; width: 300px; padding: 16px; margin-right: 16px; height: 750px; overflow-x: hidden; overflow-y: auto;">
+    <CoinOverviewComponent @ref="CoinOverviewComponentRef"></CoinOverviewComponent>
 </div>
 
 <div style="bottom: 0; left: 0px; position: fixed; padding: 16px; display: flex;">
-    <LivingCostComponent></LivingCostComponent>
-    <BoosterOverviewComponent></BoosterOverviewComponent>
+    <LivingCostComponent @ref="LivingCostComponentRef"></LivingCostComponent>
+    <BoosterOverviewComponent @ref="BoosterOverviewComponentRef"></BoosterOverviewComponent>
 </div>
 
 <div style="bottom: 0; right: 0px; position: fixed; padding: 16px;">
-    <BalanceComponent></BalanceComponent>
+    <BalanceComponent @ref="BalanceComponentRef"></BalanceComponent>
 </div>

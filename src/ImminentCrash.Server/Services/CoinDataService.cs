@@ -28,11 +28,11 @@ namespace ImminentCrash.Server.Services
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            var coinDataJson = await JsonSerializer.DeserializeAsync<JsonElement>(reader, options, cancellationToken: cancellationToken);
+            JsonElement coinDataJson = await JsonSerializer.DeserializeAsync<JsonElement>(reader, options, cancellationToken: cancellationToken);
 
-            foreach (var item2 in coinDataJson.EnumerateArray())
+            foreach (JsonElement item2 in coinDataJson.EnumerateArray())
             {
-                foreach (var item in item2.EnumerateObject())
+                foreach (JsonProperty item in item2.EnumerateObject())
                 {
                     string dateString = item.Name;
                     JsonElement coinValues = item.Value;
@@ -84,9 +84,9 @@ namespace ImminentCrash.Server.Services
 
         private decimal? GetDecimal(JsonElement element, string name)
         {
-            if (element.TryGetProperty(name, out var property))
+            if (element.TryGetProperty(name, out JsonElement property))
             {
-                if (property.ValueKind == JsonValueKind.Number && property.TryGetDecimal(out var value))
+                if (property.ValueKind == JsonValueKind.Number && property.TryGetDecimal(out decimal value))
                 {
                     return value;
                 }

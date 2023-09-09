@@ -2,31 +2,33 @@
     <h3>Balance</h3>
 
     <div>
-        <span style="font-size: xxx-large;">$ @booster.BankBalance</span>
-        <span style="border: 1px solid #000000; border-radius: 8px; padding: 3px;">@booster.Change</span>
+        <span style="font-size: xxx-large;">$ @_bankBalance</span>
+        <span style="border: 1px solid #000000; border-radius: 8px; padding: 3px;">@_change</span>
     </div>
 </div>
 
 
 @code {
-    private Balance booster = default!;
+    private decimal _bankBalance { get; set; }
+    private decimal _change { get; set; }
 
     protected override void OnInitialized()
     {
-        booster = new Balance(1, 1000, -10);
+        _bankBalance = 1000;
+        _change = -10;
     }
 
-    public class Balance
+    internal void HandleNewGameEvent(GameEvent gameEvent)
     {
-        public int Id { get; set; }
-        public int BankBalance { get; set; }
-        public int Change { get; set; }
+        _bankBalance = gameEvent.CurrentBalance;
 
-        public Balance(int id, int bankBalance, int change)
+        if (gameEvent.BalanceMovements != null)
         {
-            Id = id;
-            BankBalance = bankBalance;
-            Change = change;
+            foreach (BalanceMovement balanceMovement in gameEvent.BalanceMovements)
+            {
+                _change = balanceMovement.Amount;
+            }
         }
+        StateHasChanged();
     }
 }

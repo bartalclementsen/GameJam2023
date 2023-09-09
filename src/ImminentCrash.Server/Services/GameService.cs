@@ -41,12 +41,12 @@ namespace ImminentCrash.Server.Services
             _logger.LogInformation($"{nameof(CreateNewGameAsync)} ({request})");
 
             // TODO: Maybe store in db?
-            var gameSession = _gameSessionFactory.Invoke();
+            GameSession gameSession = _gameSessionFactory.Invoke();
             _sessions.Add(gameSession.Id, gameSession);
 
-            var minDate = _coinDataService.GetMinDate();
-            var maxDate = _coinDataService.GetMaxDate();
-            var coinData = _coinDataService.Get(minDate, maxDate);
+            DateOnly minDate = _coinDataService.GetMinDate();
+            DateOnly maxDate = _coinDataService.GetMaxDate();
+            IEnumerable<Model.CoinData> coinData = _coinDataService.Get(minDate, maxDate);
 
             gameSession.Initialize(
                 startDate: minDate.AddDays(5),
@@ -63,26 +63,26 @@ namespace ImminentCrash.Server.Services
         {
             _logger.LogInformation($"{nameof(StartGameAsync)} ({request})");
 
-            var gameSession = GetGameSessionByIdOrThrow(request.SessionId);
+            IGameSession gameSession = GetGameSessionByIdOrThrow(request.SessionId);
             return gameSession.RunAsync();
         }
 
         public Task<ContinueGameResponse> ContinueGameAsync(ContinueGameRequest request, CallContext context)
         {
-            var gameSession = GetGameSessionByIdOrThrow(request.SessionId);
+            IGameSession gameSession = GetGameSessionByIdOrThrow(request.SessionId);
             return gameSession.ContinueGameAsync(context.CancellationToken);
         }
 
         public Task<PauseGameResponse> PauseGameAsync(PauseGameRequest request, CallContext context)
         {
-            var gameSession = GetGameSessionByIdOrThrow(request.SessionId);
+            IGameSession gameSession = GetGameSessionByIdOrThrow(request.SessionId);
             return gameSession.PauseGameAsync(context.CancellationToken);
 
         }
 
         public async Task<QuitGameResponse> QuitGameAsync(QuitGameRequest request, CallContext context)
         {
-            var gameSession = GetGameSessionByIdOrThrow(request.SessionId);
+            IGameSession gameSession = GetGameSessionByIdOrThrow(request.SessionId);
             await gameSession.QuitGameAsync(context.CancellationToken);
 
             _sessions.Remove(gameSession.Id);
@@ -92,7 +92,7 @@ namespace ImminentCrash.Server.Services
         private IGameSession GetGameSessionByIdOrThrow(Guid sessionId)
         {
 
-            if (_sessions.TryGetValue(sessionId, out var gameSession) == false)
+            if (_sessions.TryGetValue(sessionId, out IGameSession? gameSession) == false)
             {
                 string msg = $"No game found with session id {sessionId}";
                 _logger.LogError(msg);
