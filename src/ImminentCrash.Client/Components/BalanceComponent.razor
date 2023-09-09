@@ -1,0 +1,32 @@
+﻿<div style="padding: 16px">
+    <h3>Balance</h3>
+
+    <div>
+        <span style="font-size: xxx-large;">$ @booster.BankBalance</span>
+        <span style="border: 1px solid #000000; border-radius: 8px; padding: 3px;">@booster.Change</span>
+    </div>
+</div>
+
+
+@code {
+    private Balance booster = default!;
+
+    protected override void OnInitialized()
+    {
+        booster = new Balance(1, 1000, -10);
+    }
+
+    public class Balance
+    {
+        public int Id { get; set; }
+        public int BankBalance { get; set; }
+        public int Change { get; set; }
+
+        public Balance(int id, int bankBalance, int change)
+        {
+            Id = id;
+            BankBalance = bankBalance;
+            Change = change;
+        }
+    }
+}
