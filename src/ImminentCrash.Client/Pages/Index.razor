@@ -1,33 +1,10 @@
 ﻿@page "/"
 @inject IImminentCrashService client;
-<PageTitle>Index</PageTitle>
+<PageTitle>Imminent Crash</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Imminent Crash</h1>
+<p><small>Version: @_version</small></p>
 
-Welcome to your new app.
+<button @onclick="() => OnStartClicked()">Start</button>
+<button @onclick="() => OnHighScoreClicked()">High Score</button>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
-
-<h1>Message from server</h1>
-
-<input type="text" @bind-value="_name" placeholder="Name" />
-<button @onclick="async () => await SendSayHelloAsync()">Send</button>
-<div>
-    @_message
-</div>
-
-@code {
-    private string? _message;
-    private string? _name;
-
-    private async Task SendSayHelloAsync()
-    {
-        var result = await client.SayHelloAsync(new SayHelloRequest()
-            {
-                Name = _name ?? "Unknown"
-            });
-
-        _message = result.Message;
-        
-    }
-}

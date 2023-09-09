@@ -10,11 +10,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImminentCrash.Server", "ImminentCrash.Server\ImminentCrash.Server.csproj", "{D13C4DC3-F828-4288-AFCC-5F3F9F7EE5B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImminentCrash.Server", "ImminentCrash.Server\ImminentCrash.Server.csproj", "{D13C4DC3-F828-4288-AFCC-5F3F9F7EE5B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImminentCrash.Client", "ImminentCrash.Client\ImminentCrash.Client.csproj", "{29378847-BA43-46B2-9501-894A7B065720}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImminentCrash.Client", "ImminentCrash.Client\ImminentCrash.Client.csproj", "{29378847-BA43-46B2-9501-894A7B065720}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImminentCrash.Contracts", "ImminentCrash.Contracts\ImminentCrash.Contracts.csproj", "{16554219-B46D-4720-9508-1E8862076471}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImminentCrash.Contracts", "ImminentCrash.Contracts\ImminentCrash.Contracts.csproj", "{16554219-B46D-4720-9508-1E8862076471}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImminentCrash.Infrastructure", "ImminentCrash.Infrastructure\ImminentCrash.Infrastructure.csproj", "{3371CF08-30A3-4C45-BA13-9A5822EF8CC9}"
 EndProject
