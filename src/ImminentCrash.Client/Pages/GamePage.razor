@@ -1,7 +1,20 @@
 ﻿@page "/Game/{SessionId:guid}"
+@using ImminentCrash.Client.Components
 
-<h3>GamePage</h3>
+<h3 style="">GamePage</h3>
 
 <button @onclick="() => OnQuitGameClicked()">Quit Game</button>
 <button @onclick="() => OnPauseGameClicked()">Pause Game</button>
 <button @onclick="() => OnContinueGameClicked()">Continue Game</button>
+
+<div style="float:left; width: 250px;">
+    <EventOverviewComponent></EventOverviewComponent>
+</div>
+
+<div style="float:right; width: 250px;">
+    <CoinOverviewComponent></CoinOverviewComponent>
+</div>
+
+<div style="bottom: 0; left: 250px; position: fixed; padding: 32px;">
+    <LivingCostComponent></LivingCostComponent>
+</div>
