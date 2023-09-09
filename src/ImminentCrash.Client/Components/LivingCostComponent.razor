@@ -1,0 +1,37 @@
+﻿<h3 style="text-decoration: underline;">Living Cost</h3>
+
+@foreach (LivingCost eventObject in Events)
+{
+    <div style="margin-bottom: 16px;">
+        <span>@eventObject.Title:</span>
+        <span>$@eventObject.Cost</span>
+    </div>
+}
+
+@code {
+    private List<LivingCost> Events = new List<LivingCost>();
+
+    protected override void OnInitialized()
+    {
+        Events = new List<LivingCost>()
+        {
+            new LivingCost(1, "Rent", 100),
+            new LivingCost(2, "Food", 50),
+        };
+    }
+
+
+    public class LivingCost
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public int Cost { get; set; }
+
+        public LivingCost(int id, string title, int cost)
+        {
+            Id = id;
+            Title = title;
+            Cost = cost;
+        }
+    }
+}
