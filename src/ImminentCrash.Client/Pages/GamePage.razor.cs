@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using ImminentCrash.Contracts.Model;
 using Microsoft.Extensions.Logging;
+using Grpc.Core;
 
 namespace ImminentCrash.Client.Pages;
 
@@ -88,9 +89,10 @@ public partial class GamePage
                 }
             }
         }
-        catch(OperationCanceledException)
+        catch(RpcException rpcException)
         {
             // Game quit
+            Logger.LogError(rpcException, "Error handeling Game Event");
         }
         catch (Exception ex)
         {

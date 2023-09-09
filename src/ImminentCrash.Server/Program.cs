@@ -11,6 +11,9 @@ var services = builder.Services;
 
 
 services.AddSingleton<IGameService, GameService>();
+services.AddSingleton<ICoinDataService, CoinDataService>();
+services.AddTransient<GameSession>();
+services.AddSingleton<Func<GameSession>>((s) => s.GetRequiredService<GameSession>);
 
 
 // Add health check
@@ -42,6 +45,10 @@ services.AddCodeFirstGrpcReflection();
 
 var app = builder.Build();
 
+var coinDataService = app.Services.GetRequiredService<ICoinDataService>();
+await coinDataService.InitializeAsync();
+
+
 //await app.UseInfrastructureAsync();
 
 app.UseHttpsRedirection();
@@ -58,3 +65,5 @@ app.MapHealthChecks("/healthz");
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 app.Run();
+
+services.AddSingleton<ICoinDataService, CoinDataService>();
