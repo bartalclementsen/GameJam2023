@@ -19,6 +19,10 @@ namespace ImminentCrash.Server.Services
         Task<QuitGameResponse> QuitGameAsync(QuitGameRequest request, CallContext context);
 
         IAsyncEnumerable<GameEvent> StartGameAsync(StartGameRequest request, CallContext context);
+
+        Task<BuyCoinsResponse> BuyCoinsAsync(BuyCoinsRequest request, CallContext context);
+
+        Task<SellCoinsResponse> SellCoinsAsync(SellCoinRequest request, CallContext context);
     }
 
     public class GameService : IGameService
@@ -87,6 +91,20 @@ namespace ImminentCrash.Server.Services
 
             _sessions.Remove(gameSession.Id);
             return new QuitGameResponse();
+        }
+
+        public async Task<BuyCoinsResponse> BuyCoinsAsync(BuyCoinsRequest request, CallContext context)
+        {
+            IGameSession gameSession = GetGameSessionByIdOrThrow(request.SessionId);
+            await gameSession.BuyCoinsAsync(request, context.CancellationToken);
+            return new BuyCoinsResponse();
+        }
+
+        public async Task<SellCoinsResponse> SellCoinsAsync(SellCoinRequest request, CallContext context)
+        {
+            IGameSession gameSession = GetGameSessionByIdOrThrow(request.SessionId);
+            await gameSession.SellCoinsAsync(request, context.CancellationToken);
+            return new SellCoinsResponse();
         }
 
         private IGameSession GetGameSessionByIdOrThrow(Guid sessionId)

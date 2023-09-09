@@ -8,14 +8,14 @@
         </div>
         <div>
             <div style="margin-bottom: 8px;">
-                <button style="border-radius: 8px; background: white; width: 52px;">+1</button>
-                <button style="border-radius: 8px; background: white; width: 52px;">+10</button>
-                <button style="border-radius: 8px; background: white; width: 52px;">+100</button>
+                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Buy(coin.Id, 1)">+1</button>
+                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Buy(coin.Id,10)">+10</button>
+                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Buy(coin.Id,100)">+100</button>
             </div>
             <div style="margin-bottom: 8px;">
-                <button style="border-radius: 8px; background: white; width: 52px;">-1</button>
-                <button style="border-radius: 8px; background: white; width: 52px;">-10</button>
-                <button style="border-radius: 8px; background: white; width: 52px;">-100</button>
+                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Sell(coin.Id, 1)">-1</button>
+                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Sell(coin.Id, 10)">-10</button>
+                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Sell(coin.Id, 100)">-100</button>
             </div>
             <div style="display: flex;">
                 <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="#@coin.Id" readonly>
@@ -25,7 +25,15 @@
     </div>
 }
 
+
 @code {
+
+    [Parameter]
+    public EventCallback<CoinOrder> OnBuy { get; set; }
+
+    [Parameter]
+    public EventCallback<CoinOrder> OnSell { get; set; }
+
     private List<Coin> Coins = new List<Coin>();
 
     protected override void OnInitialized()
@@ -75,5 +83,37 @@
             "XRP" => "https://s2.coinmarketcap.com/static/img/coins/64x64/52.png",
             _ => "https://s2.coinmarketcap.com/static/cloud/img/dex/default-icon-day.svg?_=937d1f0",
         };
+    }
+
+    private async void Buy(int coinId, int amount)
+    {
+        if (OnBuy.HasDelegate)
+        {       
+            await OnBuy.InvokeAsync(new CoinOrder()
+            {
+                CoinId = coinId,
+                Amount = amount
+            });
+        }
+    }
+
+    private async void Sell(int coinId, int amount)
+    {
+        if(OnSell.HasDelegate)
+        {
+            await OnSell.InvokeAsync(new CoinOrder()
+            {
+                CoinId = coinId,
+                Amount = amount
+            });
+        }
+
+    }
+
+    public record CoinOrder
+    {
+        public int CoinId { get; set; }
+
+        public int Amount { get; set; }
     }
 }
