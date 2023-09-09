@@ -31,6 +31,9 @@ public record GameEvent
 
     [DataMember(Order = 9)]
     public IEnumerable<LivingCost>? RemoveLivingCosts { get; init; }
+
+    [DataMember(Order = 10)]
+    public IEnumerable<Event>? NewEvents { get; init; }
 }
 
 [DataContract]
@@ -85,4 +88,13 @@ public enum LivingCostType
     Monthly
 }
 
+[DataContract]
+public record Event
+{
+    [DataMember(Order = 1)]
+    public string Title { get; init; } = string.Empty;
+
+    [DataMember(Order = 2)]
+    public string Details { get; init; } = 0;
+}
 
