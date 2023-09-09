@@ -79,6 +79,28 @@
         chartJsConfig.ReinitializeChart();
     }
 
+    public void AddDataSet(CoinType coinType, List<object> dataSet)
+    {
+        chartJsConfig.Data.Datasets.Add(new LineDataset()
+            {
+                Label = CoinTypeToString(coinType),
+                Data = dataSet,
+                PointStyle = new IndexableOption<string>(GetPointStyle(coinType, dataSet))
+            });
+    }
+
+    public void AddNewData(CoinType coinType, decimal dataEntry)
+    {
+        foreach (var dataset in chartJsConfig.Data.Datasets)
+        {
+            if (dataset is LineDataset lineDataSet)
+            {
+                if (lineDataSet.Label == CoinTypeToString(coinType))
+                    lineDataSet.Data.Add(dataEntry);
+            }
+        }
+    }
+
     /* Private */
     private List<string> BuildDays(DateTime date)
     {
@@ -99,28 +121,6 @@
         }
 
         return days;
-    }
-
-    private void AddDataSet(CoinType coinType, List<object> dataSet)
-    {
-        chartJsConfig.Data.Datasets.Add(new LineDataset()
-        {
-            Label = CoinTypeToString(coinType),
-            Data = dataSet,
-            PointStyle = new IndexableOption<string>(GetPointStyle(coinType, dataSet))
-        });
-    }
-
-    private void AddNewData(CoinType coinType, decimal dataEntry)
-    {
-        foreach (var dataset in chartJsConfig.Data.Datasets)
-        {
-            if (dataset is LineDataset lineDataSet)
-            {
-                if (lineDataSet.Label == CoinTypeToString(coinType))
-                    lineDataSet.Data.Add(dataEntry);
-            }
-        }
     }
 
     CancellationTokenSource? cancellationTokenSource;
