@@ -55,7 +55,7 @@
     /* Public */
     public void OnGameEvent(GameEvent gameEvent)
     {
-        CurrentDate = DateOnly.Parse(gameEvent.CurrentDateString);
+        CurrentDate = DateOnly.ParseExact(gameEvent.CurrentDateString, "dd.MM.yyyy");
 
         if (gameEvent.NewCoins?.Any() is true)
         {

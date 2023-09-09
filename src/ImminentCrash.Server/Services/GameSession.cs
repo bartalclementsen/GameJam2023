@@ -308,7 +308,7 @@ namespace ImminentCrash.Server.Services
                     IsDead = _gameSessionState.IsDead,
                     CurrentBalance = _gameSessionState.CurrentBalance,
                     BalanceMovements = balanceMovement,
-                    CurrentDateString = _currentDate.ToString(),
+                    CurrentDateString = _currentDate.ToString("dd.MM.yyyy"),
                     CoinMovements = coinMovements.Any() ? coinMovements : null,
                     NewCoins = newCoins.Any() ? newCoins : null,
                     RemoveCoins = null,
