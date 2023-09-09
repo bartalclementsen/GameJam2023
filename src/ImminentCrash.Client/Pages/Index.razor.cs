@@ -4,16 +4,32 @@ using System.Reflection;
 
 namespace ImminentCrash.Client.Pages;
 
-public partial class Index
+public partial class Index : IDisposable
 {
+    [Inject] protected ILogger<Index> Logger { get; set; } = default!;
+
     [Inject] public IImminentCrashService Client { get; set; } = default!;
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
+
+    private bool _disposedValue;
+
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+
     private string _version = "Unknown";
 
+    // Public
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    // Protected
     protected override void OnInitialized()
     {
+        Logger.LogInformation("Page Initialized");
         _version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown";
     }
 
@@ -22,14 +38,36 @@ public partial class Index
         return base.OnInitializedAsync();
     }
 
-    public void OnStartClicked()
+    protected virtual void Dispose(bool disposing)
     {
-        NavigationManager.NavigateTo("/Game");
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                if (_cancellationTokenSource != null)
+                {
+                    _cancellationTokenSource.Cancel();
+                    _cancellationTokenSource.Dispose();
+                }
+            }
+
+            _disposedValue = true;
+        }
+    }
+
+    // Events
+    public async void OnStartClicked()
+    {
+        Logger.LogInformation("Trying to create game");
+        var gameSession = await Client.CreateNewGameAsync(new Contracts.Model.CreateNewGameRequest(), _cancellationTokenSource.Token);
+
+        Logger.LogInformation("Game created. Navigating to Game Page");
+        NavigationManager.NavigateTo("/Game/" + gameSession.SessionId);
     }
 
     public void OnHighScoreClicked()
     {
+        Logger.LogInformation("Navigating to HighScore");
         NavigationManager.NavigateTo("/HighScore");
-
     }
 }
