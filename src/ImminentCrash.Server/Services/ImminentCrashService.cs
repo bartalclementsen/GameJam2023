@@ -41,5 +41,15 @@ namespace ImminentCrash.Server.Services
             _logger.LogInformation($"{nameof(StartNewGameAsync)} ({request})");
             return _gameService.StartGameAsync(request, context);
         }
+
+        public Task<SellCoinsResponse> SellCoinsAsync(SellCoinRequest request, CallContext context = default)
+        {
+            return _gameService.SellCoinsAsync(request, context);
+        }
+
+        public Task<BuyCoinsResponse> BuyCoinsAsync(BuyCoinsRequest request, CallContext context = default)
+        {
+            return _gameService.BuyCoinsAsync(request, context);
+        }
     }
 }

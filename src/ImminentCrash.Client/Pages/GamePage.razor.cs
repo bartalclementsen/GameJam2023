@@ -7,6 +7,7 @@ using ImminentCrash.Contracts.Model;
 using Microsoft.Extensions.Logging;
 using Grpc.Core;
 using ImminentCrash.Client.Components;
+using static ImminentCrash.Client.Components.CoinOverviewComponent;
 
 namespace ImminentCrash.Client.Pages;
 
@@ -133,5 +134,25 @@ public partial class GamePage
     private async void OnContinueGameClicked()
     {
         await Client.ContinueGameAsync(new ContinueGameRequest() { SessionId = SessionId }, _cancellationTokenSource.Token);
+    }
+
+    private async void OnBuy(CoinOrder order)
+    {
+        await Client.BuyCoinsAsync(new BuyCoinsRequest
+        {
+            Amount = order.Amount,
+            CoinId = order.CoinId,
+            SessionId = SessionId
+        });
+    }
+
+    private async void OnSell(CoinOrder order)
+    {
+        await Client.SellCoinsAsync(new SellCoinRequest
+        {
+            Amount = order.Amount,
+            CoinId = order.CoinId,
+            SessionId = SessionId
+        });
     }
 }
