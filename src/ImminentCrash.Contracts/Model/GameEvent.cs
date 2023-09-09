@@ -95,6 +95,6 @@ public record Event
     public string Title { get; init; } = string.Empty;
 
     [DataMember(Order = 2)]
-    public string Details { get; init; } = 0;
+    public string Details { get; init; } = string.Empty;
 }
 

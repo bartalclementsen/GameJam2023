@@ -84,45 +84,11 @@ namespace ImminentCrash.Server.Services
                 List<LivingCost> newLivingCosts = new();
                 List<CoinMovement> coinMovements = new();
                 List<Contracts.Model.Coin> newCoins = new();
+                List<Event> newEvents = new List<Event>();
 
-                // Apply By Order from previous Day
-                List<CoinSellOrder> sellOrders = _coinSellOrders.ToList();
-                _coinSellOrders.Clear();
-                foreach (CoinSellOrder? sellOrder in sellOrders)
-                {
-                    if (_coinOwnage.ContainsKey(sellOrder.CoinMovement.Id) == false || _coinOwnage[sellOrder.CoinMovement.Id] < sellOrder.Amount)
-                    {
-                        continue;
-                    }
+                ApplyBuyOrderFromPreviousDay(balanceMovement);
 
-                    decimal price = sellOrder.CoinMovement.Amount * sellOrder.Amount;
-                    _coinOwnage[sellOrder.CoinMovement.Id] -= sellOrder.Amount;
-
-                    balanceMovement.Add(new BalanceMovement
-                    {
-                        Amount = price,
-                        Name = ""
-                    });
-                }
-
-
-                List<CoinBuyOrder> buyOrders = _coinBuyOrders.ToList();
-                _coinBuyOrders.Clear();
-
-                foreach (CoinBuyOrder buyOrder in buyOrders)
-                {
-                    if (_coinOwnage.ContainsKey(buyOrder.CoinMovement.Id) == false)
-                    {
-                        _coinOwnage.Add(buyOrder.CoinMovement.Id, 0);
-                    }
-                    _coinOwnage[buyOrder.CoinMovement.Id] += buyOrder.Amount;
-
-                    balanceMovement.Add(new BalanceMovement
-                    {
-                        Amount = buyOrder.Price * -1,
-                        Name = ""
-                    });
-                }
+                ApplySellOrderFromPreviousDay(balanceMovement);
 
                 // Apply tick
                 _logger.LogTrace($"{Id} Send Event");
@@ -155,168 +121,17 @@ namespace ImminentCrash.Server.Services
                 // Generate Coin Movements
                 //List<Contracts.Model.Coin> RemoveCoins = new List<Contracts.Model.Coin>();
 
-                if (_coinDataByDate.TryGetValue(_currentDate, out CoinData? coinData))
+                CoinData? coinData = null;
+                if (_coinDataByDate.ContainsKey(_currentDate))
                 {
-                    if (coinData.BinanceCoin != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.BinanceCoin.Id, Amount = coinData.BinanceCoin.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.BinanceCoin.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.BinanceCoin.Id, Name = Model.Coin.BinanceCoin.Name });
-                        }
-                    }
-                    if (coinData.Bitcoin != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Bitcoin.Id, Amount = coinData.Bitcoin.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Bitcoin.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Bitcoin.Id, Name = Model.Coin.Bitcoin.Name });
-                        }
-                    }
-                    if (coinData.Cardano != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Cardano.Id, Amount = coinData.Cardano.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Cardano.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Cardano.Id, Name = Model.Coin.Cardano.Name });
-                        }
-                    }
-                    if (coinData.Chainlink != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Chainlink.Id, Amount = coinData.Chainlink.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Chainlink.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Chainlink.Id, Name = Model.Coin.Chainlink.Name });
-                        }
-                    }
-                    if (coinData.CryptoComCoin != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.CryptoComCoin.Id, Amount = coinData.CryptoComCoin.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.CryptoComCoin.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.CryptoComCoin.Id, Name = Model.Coin.CryptoComCoin.Name });
-                        }
-                    }
-                    if (coinData.Dogecoin != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Dogecoin.Id, Amount = coinData.Dogecoin.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Dogecoin.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Dogecoin.Id, Name = Model.Coin.Dogecoin.Name });
-                        }
-                    }
-                    if (coinData.Eos != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Eos.Id, Amount = coinData.Eos.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Eos.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Eos.Id, Name = Model.Coin.Eos.Name });
-                        }
-                    }
-                    if (coinData.Ethereum != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Ethereum.Id, Amount = coinData.Ethereum.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Ethereum.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Ethereum.Id, Name = Model.Coin.Ethereum.Name });
-                        }
-                    }
-                    if (coinData.Iota != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Iota.Id, Amount = coinData.Iota.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Iota.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Iota.Id, Name = Model.Coin.Iota.Name });
-                        }
-                    }
-                    if (coinData.Litecoin != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Litecoin.Id, Amount = coinData.Litecoin.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Litecoin.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Litecoin.Id, Name = Model.Coin.Litecoin.Name });
-                        }
-                    }
-                    if (coinData.Monero != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Monero.Id, Amount = coinData.Monero.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Monero.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Monero.Id, Name = Model.Coin.Monero.Name });
-                        }
-                    }
-                    if (coinData.Nem != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Nem.Id, Amount = coinData.Nem.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Nem.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Nem.Id, Name = Model.Coin.Nem.Name });
-                        }
-                    }
-                    if (coinData.Stellar != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Stellar.Id, Amount = coinData.Stellar.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Stellar.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Stellar.Id, Name = Model.Coin.Stellar.Name });
-                        }
-                    }
-                    if (coinData.Tether != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Tether.Id, Amount = coinData.Tether.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Tether.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Tether.Id, Name = Model.Coin.Tether.Name });
-                        }
-                    }
-                    if (coinData.Tron != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Tron.Id, Amount = coinData.Tron.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Tron.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Tron.Id, Name = Model.Coin.Tron.Name });
-                        }
-                    }
-                    if (coinData.Xrp != null)
-                    {
-                        coinMovements.Add(new CoinMovement { Id = Model.Coin.Xrp.Id, Amount = coinData.Xrp.Value });
-                        // Was not in last event
-                        if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Xrp.Id) != true)
-                        {
-                            newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Xrp.Id, Name = Model.Coin.Xrp.Name });
-                        }
-                    }
+                    coinData = _coinDataByDate[_currentDate];
                 }
+
+                GenerateCoinMovements(coinMovements, newCoins, coinData);
 
                 // Generate Event for tick
-                List<Event> newEvents = new List<Event>();
-                IEnumerable<GameEvent> lastFiveGameEvents = _events.Values.TakeLast(5);
-                // Check if a Event has been generated for the last five GameEvents
-                if (lastFiveGameEvents.Any(v => v.NewEvents != null) == false && coinData != null)
-                {
-                    (string highestIncreaseCoin, decimal highestIncreaseValue) = await ReturnCoinWithLargestIncrease(coinData);
-                    if (highestIncreaseValue > 0.2m)
-                    {
-                        newEvents.Add(new Event() { Title = "Coin rising!", Details = $"{highestIncreaseCoin} is going to the moon!" });
-                    }
-                }
+                GenerateEventsForTicks(newEvents, coinData);
 
-                
                 GameEvent gameEvent = new()
                 {
                     IsDead = _gameSessionState.IsDead,
@@ -340,6 +155,214 @@ namespace ImminentCrash.Server.Services
                 {
                     break;  // Stop the loop
                 }
+            }
+        }
+
+        private void GenerateCoinMovements(List<CoinMovement> coinMovements, List<Contracts.Model.Coin> newCoins, CoinData? coinData)
+        {
+            if (coinData != null)
+            {
+                if (coinData.BinanceCoin != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.BinanceCoin.Id, Amount = coinData.BinanceCoin.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.BinanceCoin.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.BinanceCoin.Id, Name = Model.Coin.BinanceCoin.Name });
+                    }
+                }
+                if (coinData.Bitcoin != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Bitcoin.Id, Amount = coinData.Bitcoin.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Bitcoin.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Bitcoin.Id, Name = Model.Coin.Bitcoin.Name });
+                    }
+                }
+                if (coinData.Cardano != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Cardano.Id, Amount = coinData.Cardano.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Cardano.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Cardano.Id, Name = Model.Coin.Cardano.Name });
+                    }
+                }
+                if (coinData.Chainlink != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Chainlink.Id, Amount = coinData.Chainlink.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Chainlink.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Chainlink.Id, Name = Model.Coin.Chainlink.Name });
+                    }
+                }
+                if (coinData.CryptoComCoin != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.CryptoComCoin.Id, Amount = coinData.CryptoComCoin.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.CryptoComCoin.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.CryptoComCoin.Id, Name = Model.Coin.CryptoComCoin.Name });
+                    }
+                }
+                if (coinData.Dogecoin != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Dogecoin.Id, Amount = coinData.Dogecoin.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Dogecoin.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Dogecoin.Id, Name = Model.Coin.Dogecoin.Name });
+                    }
+                }
+                if (coinData.Eos != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Eos.Id, Amount = coinData.Eos.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Eos.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Eos.Id, Name = Model.Coin.Eos.Name });
+                    }
+                }
+                if (coinData.Ethereum != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Ethereum.Id, Amount = coinData.Ethereum.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Ethereum.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Ethereum.Id, Name = Model.Coin.Ethereum.Name });
+                    }
+                }
+                if (coinData.Iota != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Iota.Id, Amount = coinData.Iota.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Iota.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Iota.Id, Name = Model.Coin.Iota.Name });
+                    }
+                }
+                if (coinData.Litecoin != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Litecoin.Id, Amount = coinData.Litecoin.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Litecoin.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Litecoin.Id, Name = Model.Coin.Litecoin.Name });
+                    }
+                }
+                if (coinData.Monero != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Monero.Id, Amount = coinData.Monero.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Monero.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Monero.Id, Name = Model.Coin.Monero.Name });
+                    }
+                }
+                if (coinData.Nem != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Nem.Id, Amount = coinData.Nem.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Nem.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Nem.Id, Name = Model.Coin.Nem.Name });
+                    }
+                }
+                if (coinData.Stellar != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Stellar.Id, Amount = coinData.Stellar.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Stellar.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Stellar.Id, Name = Model.Coin.Stellar.Name });
+                    }
+                }
+                if (coinData.Tether != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Tether.Id, Amount = coinData.Tether.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Tether.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Tether.Id, Name = Model.Coin.Tether.Name });
+                    }
+                }
+                if (coinData.Tron != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Tron.Id, Amount = coinData.Tron.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Tron.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Tron.Id, Name = Model.Coin.Tron.Name });
+                    }
+                }
+                if (coinData.Xrp != null)
+                {
+                    coinMovements.Add(new CoinMovement { Id = Model.Coin.Xrp.Id, Amount = coinData.Xrp.Value });
+                    // Was not in last event
+                    if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Xrp.Id) != true)
+                    {
+                        newCoins.Add(new Contracts.Model.Coin() { Id = Model.Coin.Xrp.Id, Name = Model.Coin.Xrp.Name });
+                    }
+                }
+            }
+        }
+
+        private void GenerateEventsForTicks(List<Event> newEvents, CoinData? coinData)
+        {
+            //IEnumerable<GameEvent> lastFiveGameEvents = _events.Values.TakeLast(5);
+            // Check if a Event has been generated for the last five GameEvents
+            //if (lastFiveGameEvents.Any(v => v.NewEvents != null) == false && coinData != null)
+            //{
+            //    (string highestIncreaseCoin, decimal highestIncreaseValue) = ReturnCoinWithLargestIncrease(coinData);
+            //    if (highestIncreaseValue > 0.2m)
+            //    {
+            //        newEvents.Add(new Event() { Title = "Coin rising!", Details = $"{highestIncreaseCoin} is going to the moon!" });
+            //    }
+            //}
+        }
+
+        private void ApplySellOrderFromPreviousDay(List<BalanceMovement> balanceMovement)
+        {
+            List<CoinBuyOrder> buyOrders = _coinBuyOrders.ToList();
+            _coinBuyOrders.Clear();
+
+            foreach (CoinBuyOrder buyOrder in buyOrders)
+            {
+                if (_coinOwnage.ContainsKey(buyOrder.CoinMovement.Id) == false)
+                {
+                    _coinOwnage.Add(buyOrder.CoinMovement.Id, 0);
+                }
+                _coinOwnage[buyOrder.CoinMovement.Id] += buyOrder.Amount;
+
+                balanceMovement.Add(new BalanceMovement
+                {
+                    Amount = buyOrder.Price * -1,
+                    Name = ""
+                });
+            }
+        }
+
+        private void ApplyBuyOrderFromPreviousDay(List<BalanceMovement> balanceMovement)
+        {
+            List<CoinSellOrder> sellOrders = _coinSellOrders.ToList();
+            _coinSellOrders.Clear();
+            foreach (CoinSellOrder? sellOrder in sellOrders)
+            {
+                if (_coinOwnage.ContainsKey(sellOrder.CoinMovement.Id) == false || _coinOwnage[sellOrder.CoinMovement.Id] < sellOrder.Amount)
+                {
+                    continue;
+                }
+
+                decimal price = sellOrder.CoinMovement.Amount * sellOrder.Amount;
+                _coinOwnage[sellOrder.CoinMovement.Id] -= sellOrder.Amount;
+
+                balanceMovement.Add(new BalanceMovement
+                {
+                    Amount = price,
+                    Name = ""
+                });
             }
         }
 
@@ -367,10 +390,10 @@ namespace ImminentCrash.Server.Services
             return Task.CompletedTask;
         }
 
-        private Task<(string, decimal)> ReturnCoinWithLargestIncrease(CoinData coinData)
+        private (string, decimal) ReturnCoinWithLargestIncrease(CoinData coinData)
         {
             Dictionary<string, decimal> keyValuePairs = new Dictionary<string, decimal>();
-
+            
             if (coinData.BinanceCoin != null)
             {
                 if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.BinanceCoin.Id) != true)
@@ -484,7 +507,8 @@ namespace ImminentCrash.Server.Services
                 }
             }
 
-            return Task.FromResult(keyValuePairs.OrderByDescending(kvp => kvp.Value).First().Key);
+            var first = keyValuePairs.OrderByDescending(kvp => kvp.Value).First();
+            return (first.Key, first.Value);
         }
 
         public Task SellCoinsAsync(SellCoinRequest request, CancellationToken cancellationToken)
