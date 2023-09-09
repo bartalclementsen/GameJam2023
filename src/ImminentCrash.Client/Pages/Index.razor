@@ -2,9 +2,13 @@
 @inject IImminentCrashService client;
 <PageTitle>Imminent Crash</PageTitle>
 
-<h1>Imminent Crash</h1>
-<p><small>Version: @_version</small></p>
+<div class="main-container">
+    <div class="centered-container">
+        <div class="header">
+            <h1>Imminent Crash</h1>
+        </div>
 
-<button @onclick="() => OnStartClicked()">Start</button>
-<button @onclick="() => OnHighScoreClicked()">High Score</button>
-
+        <button class="button" @onclick="() => OnStartClicked()">Start</button>
+        <button class="button" @onclick="() => OnHighScoreClicked()">High Score</button>
+    </div>
+</div>
