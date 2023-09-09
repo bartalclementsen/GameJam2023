@@ -1,0 +1,193 @@
+﻿@page "/linechart"
+@using ImminentCrash.Client.Models;
+@using pax.BlazorChartJs;
+@using System.Linq;
+
+<ChartComponent ChartJsConfig="chartJsConfig"
+                OnEventTriggered="ChartEventTriggered">
+</ChartComponent>
+
+@if(chartReady is true)
+{
+    <button @onclick="@((e) => StartTick())">Start ticking random data</button>
+    <button @onclick="@((e) => StopTicking())">Stop ticking random data</button>
+}
+@code {
+    /* Fields */
+    ChartJsConfig chartJsConfig = default!;
+    private bool chartReady;
+
+    private int _daysToSeeInThePast = 50;
+    private int _daysToSeeInTheFuture = 20;
+    private DateTime CurrentDate = DateTime.Now;
+
+    /* Properties */
+    private int TotalDaysOnChart { get => _daysToSeeInThePast + _daysToSeeInTheFuture + 1; }
+
+    /* Overrides */
+    protected override void OnInitialized()
+    {
+        chartJsConfig = new ChartJsConfig()
+        {
+            Type = ChartType.line,
+            Data = new ChartJsData()
+            {
+                Labels = BuildDays(CurrentDate),
+                Datasets = new List<ChartJsDataset>()
+            },
+            Options = new()
+            {
+                Animation = false
+            }
+        };
+
+        // test seed data
+        AddDataSet(CoinType.Bitcoin, new List<object>());
+        AddDataSet(CoinType.Etherium, new List<object>());
+
+        Enumerable.Range(0, _daysToSeeInThePast + 1).ToList().ForEach(e =>
+        {
+            AddNewRandomData(CoinType.Bitcoin);
+            AddNewRandomData(CoinType.Etherium);
+        });
+
+        base.OnInitialized();
+    }
+
+    /* Public */
+    public void Tick()
+    {
+        // Increment our current date
+        CurrentDate = CurrentDate.AddDays(1);
+        chartJsConfig.SetLabels(BuildDays(CurrentDate));
+
+        Dictionary<ChartJsDataset, SetDataObject> chartData = new();
+        foreach (var dataset in chartJsConfig.Data.Datasets)
+        {
+            if (dataset is LineDataset lineDataSet)
+            {
+                int itemsToRemove = lineDataSet.Data.Count - (int)(_daysToSeeInThePast + 1);
+                while (itemsToRemove-- > 0)
+                    lineDataSet.Data.RemoveAt(0);
+
+                lineDataSet.PointStyle = new IndexableOption<string>(GetPointStyle(CoinTypeToEnum(lineDataSet.Label), lineDataSet.Data));
+
+                chartData[dataset] = new SetDataObject(lineDataSet.Data);
+            }
+        }
+        chartJsConfig.SetData(chartData);
+        chartJsConfig.ReinitializeChart();
+    }
+
+    /* Private */
+    private List<string> BuildDays(DateTime date)
+    {
+        List<string> days = new();
+
+        for (int i = _daysToSeeInThePast; i > 0; i--)
+        {
+            DateTime offset = date.AddDays(-i);
+            days.Add($"{offset.Day}/{offset.Month}");
+        }
+
+        days.Add($"{date.Day}/{date.Month}");
+
+        for (int i = 0; i < _daysToSeeInTheFuture; ++i)
+        {
+            DateTime offset = date.AddDays(i);
+            days.Add($"{offset.Day}/{offset.Month}");
+        }
+
+        return days;
+    }
+
+    private void AddDataSet(CoinType coinType, List<object> dataSet)
+    {
+        chartJsConfig.Data.Datasets.Add(new LineDataset()
+        {
+            Label = CoinTypeToString(coinType),
+            Data = dataSet,
+            PointStyle = new IndexableOption<string>(GetPointStyle(coinType, dataSet))
+        });
+    }
+
+    private void AddNewData(CoinType coinType, decimal dataEntry)
+    {
+        foreach (var dataset in chartJsConfig.Data.Datasets)
+        {
+            if (dataset is LineDataset lineDataSet)
+            {
+                if (lineDataSet.Label == CoinTypeToString(coinType))
+                    lineDataSet.Data.Add(dataEntry);
+            }
+        }
+    }
+
+    CancellationTokenSource? cancellationTokenSource;
+    private void StopTicking()
+    {
+        cancellationTokenSource?.Cancel();
+    }
+
+    private async Task StartTick()
+    {
+        cancellationTokenSource?.Cancel();
+        cancellationTokenSource?.Dispose();
+        cancellationTokenSource = new CancellationTokenSource();
+        if (chartReady is not true)
+            return;
+
+        PeriodicTimer periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(1000));
+        while (await periodicTimer.WaitForNextTickAsync(cancellationTokenSource.Token))
+        {
+            AddNewRandomData(CoinType.Bitcoin);
+            AddNewRandomData(CoinType.Etherium);
+
+            Tick();
+        }
+    }
+
+    private List<string> GetPointStyle(CoinType coinType, IList<object> dataset)
+    {
+        if (dataset.Count < 1)
+            return new ();
+
+        List<string> ret = new (dataset.Count);
+        Enumerable.Range(0, dataset.Count() - 1).ToList().ForEach(e => ret.Add("circle"));
+
+        // For now until we figure out how to add Images to the PointStyle using C# we're just going to default to a triangle :-(
+        ret.Add(coinType switch
+        {
+            _ => "triangle"
+        });
+        return ret;
+    }
+
+    private void AddNewRandomData(CoinType coinType) => AddNewData(coinType, (decimal)(Random.Shared.NextDouble() * 10d));
+
+    private string CoinTypeToString(CoinType type) => type switch {
+        CoinType.Bitcoin => "Bitcoin",
+        CoinType.Etherium => "Etherium",
+        CoinType.DogeCoin => "Doge Coin",
+        CoinType.Tether => "Tether",
+        _ => "Unknown"
+    };
+
+    private CoinType CoinTypeToEnum(string type) => type switch
+    {
+        "Bitcoin" => CoinType.Bitcoin,
+        "Etherium" => CoinType.Etherium ,
+        "Doge Coi" => CoinType.DogeCoin,
+        "Tether" => CoinType.Tether,
+        _ => throw new NotImplementedException()
+    };
+
+    /* Events */
+    private void ChartEventTriggered(ChartJsEvent chartJsEvent)
+    {
+        if (chartJsEvent is ChartJsInitEvent initEvent)
+        {
+            chartReady = true;
+        }
+    }
+}
