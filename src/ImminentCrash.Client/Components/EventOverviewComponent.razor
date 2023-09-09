@@ -1,0 +1,37 @@
+﻿<h3>Event overview</h3>
+
+@foreach (Event eventObject in Events)
+{
+    <div style="margin-bottom: 16px;">
+        <h5>@eventObject.Title</h5>
+        <span>@eventObject.Details</span>
+    </div>
+}
+
+@code {
+    private List<Event> Events = new List<Event>();
+
+    protected override void OnInitialized()
+    {
+        Events = new List<Event>()
+        {
+            new Event(1, "New Coin", "Bitcoin was just added to the crypto exchange."),
+            new Event(2, "Message from Ex-Girlfriend", "I'm pregnent! I know you are the father. You need to buy diapers."),
+        };
+    }
+
+
+    public class Event
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Details { get; set; }
+
+        public Event(int id, string title, string details)
+        {
+            Id = id;
+            Title = title;
+            Details = details;
+        }
+    }
+}
