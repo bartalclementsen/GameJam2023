@@ -21,6 +21,8 @@ public partial class GamePage
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
+    private bool _isDead;
+
     private bool _disposedValue;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -120,6 +122,12 @@ public partial class GamePage
         BoosterOverviewComponentRef.HandleNewGameEvent(gameEvent);
         BalanceComponentRef.HandleNewGameEvent(gameEvent);
         LineChartComponentRef.OnGameEvent(gameEvent);
+
+        if(gameEvent.IsDead) 
+        {
+            _isDead = true;
+            StateHasChanged();
+        }
     }
 
     private async void OnQuitGameClicked()
@@ -156,5 +164,10 @@ public partial class GamePage
             CoinId = order.CoinId,
             SessionId = SessionId
         });
+    }
+
+    private void OnBackToMainMenuClicked()
+    {
+        NavigationManager.NavigateTo("/");
     }
 }
