@@ -303,6 +303,20 @@ namespace ImminentCrash.Server.Services
                     }
                 }
 
+                // Generate Event for tick
+                List<Event> newEvents = new List<Event>();
+                IEnumerable<GameEvent> lastFiveGameEvents = _events.Values.TakeLast(5);
+                // Check if a Event has been generated for the last five GameEvents
+                if (lastFiveGameEvents.Any(v => v.NewEvents != null) == false && coinData != null)
+                {
+                    (string highestIncreaseCoin, decimal highestIncreaseValue) = await ReturnCoinWithLargestIncrease(coinData);
+                    if (highestIncreaseValue > 0.2m)
+                    {
+                        newEvents.Add(new Event() { Title = "Coin rising!", Details = $"{highestIncreaseCoin} is going to the moon!" });
+                    }
+                }
+
+                
                 GameEvent gameEvent = new()
                 {
                     IsDead = _gameSessionState.IsDead,
@@ -312,7 +326,8 @@ namespace ImminentCrash.Server.Services
                     CoinMovements = coinMovements.Any() ? coinMovements : null,
                     NewCoins = newCoins.Any() ? newCoins : null,
                     RemoveCoins = null,
-                    NewLivingCosts = newLivingCosts.Any() ? newLivingCosts : null
+                    NewLivingCosts = newLivingCosts.Any() ? newLivingCosts : null,
+                    NewEvents = newEvents.Any() ? newEvents : null,
                 };
 
                 // Send Game Event
@@ -350,6 +365,126 @@ namespace ImminentCrash.Server.Services
 
             _cancellationTokenSource.Cancel();
             return Task.CompletedTask;
+        }
+
+        private Task<(string, decimal)> ReturnCoinWithLargestIncrease(CoinData coinData)
+        {
+            Dictionary<string, decimal> keyValuePairs = new Dictionary<string, decimal>();
+
+            if (coinData.BinanceCoin != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.BinanceCoin.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.BinanceCoin.Name, coinData.BinanceCoin.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.BinanceCoin.Id).Amount);
+                }
+            }
+            if (coinData.Bitcoin != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Bitcoin.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Bitcoin.Name, coinData.Bitcoin.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Bitcoin.Id).Amount);
+                }
+            }
+            if (coinData.Cardano != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Cardano.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Cardano.Name, coinData.Cardano.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Cardano.Id).Amount);
+                }
+            }
+            if (coinData.Chainlink != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Chainlink.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Chainlink.Name, coinData.Chainlink.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Chainlink.Id).Amount);
+                }
+            }
+            if (coinData.CryptoComCoin != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.CryptoComCoin.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.CryptoComCoin.Name, coinData.CryptoComCoin.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.CryptoComCoin.Id).Amount);
+                }
+            }
+            if (coinData.Dogecoin != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Dogecoin.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Dogecoin.Name, coinData.Dogecoin.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Dogecoin.Id).Amount);
+                }
+            }
+            if (coinData.Eos != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Eos.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Eos.Name, coinData.Eos.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Eos.Id).Amount);
+                }
+            }
+            if (coinData.Ethereum != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Ethereum.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Ethereum.Name, coinData.Ethereum.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Ethereum.Id).Amount);
+                }
+            }
+            if (coinData.Iota != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Iota.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Iota.Name, coinData.Iota.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Iota.Id).Amount);
+                }
+            }
+            if (coinData.Litecoin != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Litecoin.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Litecoin.Name, coinData.Litecoin.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Litecoin.Id).Amount);
+                }
+            }
+            if (coinData.Monero != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Monero.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Monero.Name, coinData.Monero.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Monero.Id).Amount);
+                }
+            }
+            if (coinData.Nem != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Nem.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Nem.Name, coinData.Nem.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Nem.Id).Amount);
+                }
+            }
+            if (coinData.Stellar != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Stellar.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Stellar.Name, coinData.Stellar.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Stellar.Id).Amount);
+                }
+            }
+            if (coinData.Tether != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Tether.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Tether.Name, coinData.Tether.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Tether.Id).Amount);
+                }
+            }
+            if (coinData.Tron != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Tron.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Tron.Name, coinData.Tron.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Tron.Id).Amount);
+                }
+            }
+            if (coinData.Xrp != null)
+            {
+                if (_previousEvent?.CoinMovements?.Any(c => c.Id == Model.Coin.Xrp.Id) != true)
+                {
+                    keyValuePairs.Add(Model.Coin.Xrp.Name, coinData.Xrp.Value - _previousEvent!.CoinMovements!.First(cm => cm.Id == Model.Coin.Xrp.Id).Amount);
+                }
+            }
+
+            return Task.FromResult(keyValuePairs.OrderByDescending(kvp => kvp.Value).First().Key);
         }
 
         public Task SellCoinsAsync(SellCoinRequest request, CancellationToken cancellationToken)
@@ -393,7 +528,6 @@ namespace ImminentCrash.Server.Services
         public record CoinBuyOrder(CoinMovement CoinMovement, int Amount, decimal Price);
 
         public record CoinSellOrder(CoinMovement CoinMovement, int Amount);
-
 
     }
 
