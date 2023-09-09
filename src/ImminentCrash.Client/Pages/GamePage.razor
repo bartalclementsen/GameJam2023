@@ -7,14 +7,15 @@
 <button @onclick="() => OnPauseGameClicked()">Pause Game</button>
 <button @onclick="() => OnContinueGameClicked()">Continue Game</button>
 
-<div style="float:left; width: 250px;">
+<div style="float:left; width: 250px; padding: 16px;">
     <EventOverviewComponent></EventOverviewComponent>
 </div>
 
-<div style="float:right; width: 250px;">
+<div style="float:right; width: 250px; padding: 16px; margin-right: 16px;">
     <CoinOverviewComponent></CoinOverviewComponent>
 </div>
 
-<div style="bottom: 0; left: 250px; position: fixed; padding: 32px;">
+<div style="bottom: 0; left: 0px; position: fixed; padding: 16px; display: flex;">
     <LivingCostComponent></LivingCostComponent>
+    <BoosterOverviewComponent></BoosterOverviewComponent>
 </div>

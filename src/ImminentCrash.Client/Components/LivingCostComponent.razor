@@ -1,12 +1,14 @@
-﻿<h3 style="text-decoration: underline;">Living Cost</h3>
+﻿<div>
+    <h3 style="text-decoration: underline;">Living Cost</h3>
 
-@foreach (LivingCost eventObject in Events)
-{
-    <div style="margin-bottom: 16px;">
-        <span>@eventObject.Title:</span>
-        <span>$@eventObject.Cost</span>
-    </div>
-}
+    @foreach (LivingCost eventObject in Events)
+    {
+        <div style="margin-bottom: 16px;">
+            <span>@eventObject.Title:</span>
+            <span>$@eventObject.Cost</span>
+        </div>
+    }
+</div>
 
 @code {
     private List<LivingCost> Events = new List<LivingCost>();
