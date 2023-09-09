@@ -4,6 +4,7 @@ using ImminentCrash.Client;
 using ImminentCrash.Contracts;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using pax.BlazorChartJs;
 using ProtoBuf.Grpc.Client;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -36,6 +37,13 @@ builder.Services.AddTransient(services => services
     .GetRequiredService<GrpcChannel>()
     .CreateGrpcService<IImminentCrashService>()
 );
+
+builder.Services.AddChartJs(options =>
+{
+    // default
+    options.ChartJsLocation = "https://cdn.jsdelivr.net/npm/chart.js";
+    options.ChartJsPluginDatalabelsLocation = "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2";
+});
 
 WebAssemblyHost host = builder.Build();
 
