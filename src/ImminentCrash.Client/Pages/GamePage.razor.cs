@@ -4,6 +4,7 @@ using System.Reflection;
 using System;
 using System.IO;
 using ImminentCrash.Contracts.Model;
+using Microsoft.Extensions.Logging;
 
 namespace ImminentCrash.Client.Pages;
 
@@ -73,9 +74,28 @@ public partial class GamePage
     {
         Logger.LogInformation("Handeling stream");
 
-        await foreach (var gameEvent in stream)
+        try
         {
-            Logger.LogInformation(gameEvent.Time.ToString());
+            await foreach (var gameEvent in stream)
+            {
+                Logger.LogInformation(gameEvent.ToString());
+
+                if (gameEvent.IsDead)
+                {
+                    // TODO: Show dead screen
+                    Logger.LogInformation("You are dead");
+                    NavigationManager.NavigateTo("/");
+                }
+            }
+        }
+        catch(OperationCanceledException)
+        {
+            // Game quit
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error handeling Game Event");
+            throw;
         }
     }
 

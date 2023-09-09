@@ -18,19 +18,26 @@ namespace ImminentCrash.Server.Services
 
     public class GameSession : IGameSession
     {
+        // Fields
         public Guid Id { get; set; }
 
-        private ILogger<GameSession> _logger;
-
-
+        private bool _isPaused = false;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-        private bool _isPaused = false;
+        private readonly PeriodicTimer _periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        private readonly ILogger<GameSession> _logger;
+        private readonly GameSessionState _gameSessionState;
 
+        // Constructor
         public GameSession(ILogger<GameSession> logger)
         {
             Id = Guid.NewGuid();
             _logger = logger;
+
+            _gameSessionState = new GameSessionState
+            {
+                CurrentBalance = 1000,
+            };
         }
 
         public async IAsyncEnumerable<GameEvent> RunAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -38,18 +45,41 @@ namespace ImminentCrash.Server.Services
             _logger.LogDebug($"{Id} {nameof(RunAsync)}");
 
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            while (!_cancellationTokenSource.Token.IsCancellationRequested)
+
+            while (!_cancellationTokenSource.Token.IsCancellationRequested && await _periodicTimer.WaitForNextTickAsync(_cancellationTokenSource.Token))
             {
                 await Task.Delay(TimeSpan.FromSeconds(1), _cancellationTokenSource.Token);
-
-                if (!_isPaused)
+                if (_isPaused)
                 {
-                    _logger.LogTrace($"{Id} Send Event");
-                    yield return new GameEvent { Time = DateTime.UtcNow };
+                    // Skip this tick
+                    continue;
                 }
-                else
+
+                // Apply tick
+                _logger.LogTrace($"{Id} Send Event");
+
+                // Generate costs for tick
+                var balanceMovement = new List<BalanceMovement>();
+                balanceMovement.Add(new BalanceMovement()
                 {
-                    _logger.LogTrace($"{Id} PAUSED no send event");
+                    Amount = -50,
+                    Name = "Living Costs"
+                });
+
+                // Apply cost
+                _gameSessionState.CurrentBalance += balanceMovement.Sum(o => o.Amount);
+
+                // Send Game Event
+                yield return new GameEvent
+                {
+                    IsDead = _gameSessionState.IsDead,
+                    CurrentBalance = _gameSessionState.CurrentBalance,
+                    BalanceMovements = balanceMovement
+                };
+
+                if (_gameSessionState.IsDead)
+                {
+                    break;  // Stop the loop
                 }
             }
         }
@@ -77,5 +107,12 @@ namespace ImminentCrash.Server.Services
             _cancellationTokenSource.Cancel();
             return Task.CompletedTask;
         }
+    }
+
+    public class GameSessionState
+    {
+        public bool IsDead => CurrentBalance < 0;
+
+        public decimal CurrentBalance { get; set; }
     }
 }
