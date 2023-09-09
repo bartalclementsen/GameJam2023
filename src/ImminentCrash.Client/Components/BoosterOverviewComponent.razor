@@ -1,0 +1,58 @@
+﻿<div style="display: flex; gap: 20px; padding: 16px; margin-left: 16px; ">
+    @foreach (Booster booster in Boosters)
+    {
+        <div style="text-align: center;">
+            <!-- icon -->
+            <div>
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1.png" style="height: 55px; margin-bottom: 8px;" title="@booster.ToolTip">
+            </div>
+            <div>
+                @if (booster.IsReady)
+                {
+                    <span style="border: 1px solid #000000; border-radius: 8px; padding: 3px; color: white; background: green;" title="Ready for use.">Ready</span>
+                }
+                else
+                {
+                    <span style="border: 1px solid #000000; border-radius: 8px; padding: 3px; color: white; background: red;" title="There is a cool time period before you can use this booster.">@booster.CooldownTimer</span>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+
+@code {
+    private List<Booster> Boosters = new List<Booster>();
+
+    protected override void OnInitialized()
+    {
+        Boosters = new List<Booster>()
+        {
+            new Booster(1, "Show Future", "The graph will show future trends.", 0),
+            new Booster(2, "Mommy!", "Your mother will pay the bills for you.", 10),
+        };
+    }
+
+    public class Booster
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string ToolTip { get; set; }
+        public int CooldownTimer { get; set; }
+        public bool IsReady
+        {
+            get
+            {
+                return CooldownTimer == 0;
+            }
+        }
+
+        public Booster(int id, string name, string toolTip, int cooldownTimer)
+        {
+            Id = id;
+            Name = name;
+            ToolTip = toolTip;
+            CooldownTimer = cooldownTimer;
+        }
+    }
+}
