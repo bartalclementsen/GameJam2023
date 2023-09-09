@@ -15,27 +15,27 @@ namespace ImminentCrash.Server.Model
 
         public static Coin CryptoComCoin => new Coin(5, "Crypto.com Coin");
 
-        public static Coin Dogecoin => new Coin(5, "Dogecoin");
+        public static Coin Dogecoin => new Coin(6, "Dogecoin");
 
-        public static Coin Eos => new Coin(6, "EOS");
+        public static Coin Eos => new Coin(7, "EOS");
 
-        public static Coin Ethereum => new Coin(7, "Ethereum");
+        public static Coin Ethereum => new Coin(8, "Ethereum");
 
-        public static Coin Iota => new Coin(8, "IOTA");
+        public static Coin Iota => new Coin(9, "IOTA");
 
-        public static Coin Litecoin => new Coin(8, "Litecoin");
+        public static Coin Litecoin => new Coin(10, "Litecoin");
 
-        public static Coin Monero => new Coin(9, "Monero");
+        public static Coin Monero => new Coin(11, "Monero");
 
-        public static Coin Nem => new Coin(10, "NEM");
+        public static Coin Nem => new Coin(12, "NEM");
 
-        public static Coin Stellar => new Coin(11, "Stellar");
+        public static Coin Stellar => new Coin(13, "Stellar");
 
-        public static Coin Tether => new Coin(12, "Tether");
+        public static Coin Tether => new Coin(14, "Tether");
 
-        public static Coin Tron => new Coin(13, "TRON");
+        public static Coin Tron => new Coin(15, "TRON");
 
-        public static Coin Xrp => new Coin(14, "XRP");
+        public static Coin Xrp => new Coin(16, "XRP");
 
         public Coin(int id, string name) : base(id, name) { }
     }

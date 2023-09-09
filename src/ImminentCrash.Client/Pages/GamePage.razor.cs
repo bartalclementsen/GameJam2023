@@ -29,6 +29,7 @@ public partial class GamePage
     private LivingCostComponent LivingCostComponentRef = default!;
     private BoosterOverviewComponent BoosterOverviewComponentRef = default!;
     private BalanceComponent BalanceComponentRef = default!;
+    private LineChartComponent LineChartComponentRef = default!;
 
     // Public
     public void Dispose()
@@ -94,7 +95,7 @@ public partial class GamePage
                 {
                     // TODO: Show dead screen
                     Logger.LogInformation("You are dead");
-                    NavigationManager.NavigateTo("/");
+                    //NavigationManager.NavigateTo("/");
                 }
             }
         }
@@ -117,6 +118,7 @@ public partial class GamePage
         LivingCostComponentRef.HandleNewGameEvent(gameEvent);
         BoosterOverviewComponentRef.HandleNewGameEvent(gameEvent);
         BalanceComponentRef.HandleNewGameEvent(gameEvent);
+        LineChartComponentRef.OnGameEvent(gameEvent);
     }
 
     private async void OnQuitGameClicked()
