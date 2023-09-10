@@ -147,3 +147,37 @@
     -moz-box-shadow: 10px 10px 30px 0px rgba(0,0,0,0.75);
     box-shadow: 10px 10px 30px 0px rgba(0,0,0,0.75);
 }
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: white;
+    opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: white;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+    color: white;
+}
+
+.death-dialog__window .input {
+    background-color: rosybrown;
+    color: white;
+    border: 1px solid black;
+    border-radius: 1em;
+    padding: 2em;
+    margin: 1em;
+    color: white;
+    width: 50%;
+}
+
+.death-dialog__window .button {
+    background-color: rosybrown;
+    color: white;
+    border: 1px solid black;
+    border-radius: 1em;
+    padding: 1em;
+    margin: 1em;
+    width: 50%;
+}

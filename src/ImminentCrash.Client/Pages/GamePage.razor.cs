@@ -53,14 +53,14 @@ public partial class GamePage
         Logger.LogInformation("Page Initialized");
 
         Logger.LogInformation("Starting game");
-        IAsyncEnumerable<GameEvent> stream = Client.StartNewGameAsync(new StartGameRequest
-        {
-            SessionId = SessionId,
-        }, _cancellationTokenSource.Token);
+        //IAsyncEnumerable<GameEvent> stream = Client.StartNewGameAsync(new StartGameRequest
+        //{
+        //    SessionId = SessionId,
+        //}, _cancellationTokenSource.Token);
 
         Logger.LogInformation("Game started");
 
-        HandleStream(stream);
+        //HandleStream(stream);
     }
 
     protected override Task OnInitializedAsync()

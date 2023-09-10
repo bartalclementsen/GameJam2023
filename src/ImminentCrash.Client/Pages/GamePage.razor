@@ -43,10 +43,13 @@
 
 <div class="death-dialog" style="display:@((_isDead || _isWinner) ? "flex" : "none");">
     <div class="death-dialog__window">
-        <h1 style="margin-bottom:20px;">@(_isDead ? "You went bankrupt" : "You won, you're not officialy a crypto bro!")</h1>
-        <input id="highscore-name" type="text" @bind-value="@_highScoreName" />
-        <label for="highscore-name">Enter your name</label>
-        <button @onclick="() => OnSaveHighScore()">Save Highscore</button>
-        <button @onclick="() => OnBackToMainMenuClicked()">Back to main menu</button>
+
+        <h1 style="margin-bottom:20px;">@(_isDead ? "You went bankrupt" : "You won, you're now officialy a crypto bro!")</h1>
+
+        <label for="highscore-name">Enter your name below</label>
+        <input id="highscore-name" type="text" class="input" @bind-value="@_highScoreName" placeholder="Type your name here"/>
+
+        <button @onclick="() => OnSaveHighScore()" class="button">Save Highscore</button>
+        <button @onclick="() => OnBackToMainMenuClicked()" class="button">Back to main menu</button>
     </div>
 </div>
