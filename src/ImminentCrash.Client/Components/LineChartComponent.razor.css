@@ -1,0 +1,12 @@
+﻿.graph-wrapper {
+    background-color: white;
+    border: 2px solid black;
+    padding: 15px;
+    border-radius: 15px;
+    width: 100%;
+    height: auto;
+    margin: 25px;
+    box-shadow: -1px -1px 18px -2px rgba(0,0,0,0.75);
+    -webkit-box-shadow: -1px -1px 18px -2px rgba(0,0,0,0.75);
+    -moz-box-shadow: -1px -1px 18px -2px rgba(0,0,0,0.75);
+}
