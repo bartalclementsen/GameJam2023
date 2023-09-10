@@ -1,6 +1,7 @@
+@using ImminentCrash.Client.Models;
 @foreach(DataItem coin in coins)
 {
-    <div class="coin">
+    <div class="coin" style="background-color: @(coin.Color); ">
         <div class="coin-row">
             <img src="@GetIconLink(coin.Name)" title="@coin.Name" />
         </div>
@@ -178,10 +179,14 @@
 
         public bool CanSell100 => Amount >= 100;
 
+        public string Color { get; set; }
+
         public DataItem(Coin coin)
         {
             Id = coin.Id;
             Name = coin.Name;
+
+            Color = CoinColors.GetColor(coin.Id - 1);
         }
 
         public void Apply(CoinAmount coinAmount)
