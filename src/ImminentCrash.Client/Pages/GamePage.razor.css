@@ -1,4 +1,129 @@
-﻿.death-dialog {
+﻿.main-container {
+    --left-column-width: 15vw;
+    --right-column-width: 15vw;
+    --center-column-width: calc(100vw - (var(--left-column-width) + var(--right-column-width)));
+    background-color: orange;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: 100vw;
+}
+
+.main-container .left-column {
+    --event-column-height: 80vh;
+    --living-cost-column-height: calc(100vh - var(--event-column-height));
+    height: 100vh;
+    width: var(--left-column-width);
+    /*background-color: red;*/
+    display: flex;
+    flex-direction: column;
+    box-shadow: 1px 0px 0px 0px rgba(0,0,0,1);
+    -webkit-box-shadow: 1px 0px 0px 0px rgba(0,0,0,1);
+    -moz-box-shadow: 1px 0px 0px 0px rgba(0,0,0,1);
+}
+
+.main-container .left-column .events {
+    height: var(--event-column-height);
+    width: var(--left-column-width);
+    /*background-color: red;*/
+    overflow-y: auto;
+}
+
+.main-container .left-column .living-cost {
+    height: var(--living-cost-column-height);
+    width: var(--left-column-width);
+    /*background-color: purple;*/
+    box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    -webkit-box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    -moz-box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    padding: 1em;
+}
+
+.main-container .center-column {
+    --line-graph-column-height: 85vh;
+    --power-ups-column-height: calc(100vh - var(--line-graph-column-height));
+    height: 100vh;
+    width: var(--center-column-width);
+    /*background-color: green;*/
+    display: flex;
+    flex-direction: column;
+}
+
+.main-container .center-column .line-graph {
+    height: var(--line-graph-column-height);
+    width: var(--center-column-width);
+    /*background-color: green;*/
+    display: flex;
+    align-items: center;
+}
+
+.main-container .center-column .power-ups {
+    height: var(--power-ups-column-height);
+    width: var(--center-column-width);
+    /*background-color: orange;*/
+    box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    -webkit-box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    -moz-box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    overflow-y: auto;
+}
+
+.main-container .right-column {
+    --game-action-buttons: 8vh;
+    --coins-column-height: 70vh;
+    --balance-column-height: calc(100vh - (var(--coins-column-height) + var(--game-action-buttons)));
+    height: 100vh;
+    width: var(--right-column-width);
+    /*background-color: blue;*/
+    display: flex;
+    flex-direction: column;
+    box-shadow: 1px 0px 0px 0px rgba(0,0,0,1) inset;
+    -webkit-box-shadow: 1px 0px 0px 0px rgba(0,0,0,1) inset;
+    -moz-box-shadow: 1px 0px 0px 0px rgba(0,0,0,1) inset;
+}
+
+.main-container .right-column .game-actions {
+    height: var(--game-action-buttons);
+    width: var(--right-column-width);
+    /*background-color: white;*/
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+}
+
+.main-container .right-column .game-actions .button {
+    color: white;
+    background-color: rosybrown;
+    height: 5vh;
+    border-radius: 1em;
+    padding: 1em;
+    margin: 1vh 0;
+    -webkit-box-shadow: 10px 10px 65px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 10px 10px 65px 0px rgba(0,0,0,0.75);
+    box-shadow: 10px 10px 65px 0px rgba(0,0,0,0.75);
+}
+
+.main-container .right-column .coins {
+    height: var(--coins-column-height);
+    width: var(--right-column-width);
+    /*background-color: blue;*/
+    box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    -webkit-box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    -moz-box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    overflow-y: auto;
+}
+
+.main-container .right-column .balance {
+    height: var(--balance-column-height);
+    width: var(--right-column-width);
+    /*background-color: pink;*/
+    box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    -webkit-box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    -moz-box-shadow: 1px -1px 0px 0px rgba(0,0,0,1);
+    padding: 1em;
+}
+
+.death-dialog {
     position: absolute;
     left: 0;
     top: 0;

@@ -10,12 +10,9 @@
     ChartJsConfig chartJsConfig = default!;
     private bool chartReady;
 
-    private int _daysToSeeInThePast = 50;
+    private int _daysToSeeInThePast = 30;
     private int _daysToSeeInTheFuture = 20;
     private DateOnly CurrentDate = default!;
-
-    /* Properties */
-    private int TotalDaysOnChart { get => _daysToSeeInThePast + _daysToSeeInTheFuture + 1; }
 
     /* Overrides */
     protected override void OnInitialized()
@@ -35,12 +32,48 @@
                 {
                     X = new ChartJsAxis()
                     {
-                        Display = true
+                        Display = true,
+                        Ticks = new ChartJsAxisTick()
+                        {
+                            Color = "white",
+                            Font = new Font()
+                            {
+                                Family = "Montserrat",
+                                Size = 15d,
+                            }
+                        },
+                        Grid = new()
+                        {
+                            TickColor = "red",
+                                Color = "darkgrey"
+                        }
                     },
                     Y = new ChartJsAxis()
                     {
                         Display = true,
-                        Type = "logarithmic"
+                        Type = "logarithmic",
+                        Ticks = new ChartJsAxisTick()
+                        {
+                            Color = "white",
+                            Font = new Font()
+                            {
+                                Family = "Montserrat",
+                                Size = 20d,
+                            }
+                        },
+                        Grid = new()
+                        {
+                            TickColor = "green",
+                            Color = "darkgrey",
+                        }
+                    },
+                },
+                
+                Plugins = new()
+                {
+                    Legend = new()
+                    {
+                        Display = false
                     }
                 }
             }
@@ -144,7 +177,7 @@
             if (dataset is LineDataset lineDataSet)
             {
                 if (lineDataSet.Label == CoinTypeToString(coinType))
-                    lineDataSet.Data.Add(dataEntry);
+                    lineDataSet.Data.Add(Math.Round(dataEntry, 2));
             }
         }
     }
@@ -164,7 +197,7 @@
                 ArbitraryLineColor = "black",
                 XPosition = _daysToSeeInThePast,
                 XWidth = 2,
-                Text = "Arbitrary Line"
+                Text = string.Empty
             }
         };
 

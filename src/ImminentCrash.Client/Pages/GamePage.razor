@@ -1,31 +1,44 @@
 ﻿@page "/Game/{SessionId:guid}"
 @using ImminentCrash.Client.Components
 
-<h3 style="">GamePage</h3>
+<div class="main-container">
+    <div class="left-column">
+        <div class="events">
+            <EventOverviewComponent @ref="EventOverviewComponentRef"></EventOverviewComponent>
+        </div>
+        <div class="living-cost">
+            <LivingCostComponent @ref="LivingCostComponentRef"></LivingCostComponent>
+        </div>
+    </div>
 
-<button @onclick="() => OnQuitGameClicked()">Quit Game</button>
-<button @onclick="() => OnPauseGameClicked()">Pause Game</button>
-<button @onclick="() => OnContinueGameClicked()">Continue Game</button>
+    <div class="center-column">
+        <div class="line-graph">
+            <LineChartComponent @ref="LineChartComponentRef" />
+        </div>
+        <div class="power-ups">
+            <BoosterOverviewComponent @ref="BoosterOverviewComponentRef"></BoosterOverviewComponent>
+        </div>
+    </div>
 
-<div style="position: fixed; display: block;width:76%;height:90%;margin: 0 12%;">
-    <LineChartComponent @ref="LineChartComponentRef" />
-</div>
-
-<div style="float:left; width: 250px; padding: 16px;">
-    <EventOverviewComponent @ref="EventOverviewComponentRef"></EventOverviewComponent>
-</div>
-
-<div style="float:right; width: 300px; padding: 16px; margin-right: 16px; height: 750px; overflow-x: hidden; overflow-y: auto;">
-    <CoinOverviewComponent @ref="CoinOverviewComponentRef" OnBuy="OnBuy" OnSell="OnSell"></CoinOverviewComponent>
-</div>
-
-<div style="bottom: 0; left: 0px; position: fixed; padding: 16px; display: flex;">
-    <LivingCostComponent @ref="LivingCostComponentRef"></LivingCostComponent>
-    <BoosterOverviewComponent @ref="BoosterOverviewComponentRef"></BoosterOverviewComponent>
-</div>
-
-<div style="bottom: 0; right: 0px; position: fixed; padding: 16px;">
-    <BalanceComponent @ref="BalanceComponentRef"></BalanceComponent>
+    <div class="right-column">
+        <div class="game-actions">
+            <button class="button" @onclick="() => OnQuitGameClicked()">Quit Game</button>
+            @if (_isPaused is true)
+            {
+                <button class="button" @onclick="() => OnContinueGameClicked()">Continue Game</button>
+            }
+            else
+            {
+                <button class="button" @onclick="() => OnPauseGameClicked()">Pause Game</button>
+            }
+        </div>
+        <div class="coins">
+            <CoinOverviewComponent @ref="CoinOverviewComponentRef" OnBuy="OnBuy" OnSell="OnSell"></CoinOverviewComponent>
+        </div>
+        <div class="balance">
+            <BalanceComponent @ref="BalanceComponentRef"></BalanceComponent>
+        </div>
+    </div>
 </div>
 
 <div class="death-dialog" style="display:@(_isDead ? "flex" : "none");">
