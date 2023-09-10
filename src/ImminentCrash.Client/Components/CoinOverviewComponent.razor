@@ -1,4 +1,6 @@
 @using ImminentCrash.Client.Models;
+@inject IJSRuntime JSRuntime;
+
 @foreach(DataItem coin in coins)
 {
     <div class="coin" style="background-color: @(coin.Color); ">
@@ -26,6 +28,7 @@
             </div>
         </div>
     </div>
+    <audio src="/audio/cash-register-purchase.mp3" id="buyAudio"></audio>
 }
 
 @code {
@@ -126,6 +129,7 @@
                 Amount = amount
             });
         }
+        await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "buyAudio");
     }
 
     private async void Sell(DataItem coin, int amount)
@@ -147,6 +151,7 @@
                 Amount = amount
             });
         }
+        await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "buyAudio");
 
     }
 

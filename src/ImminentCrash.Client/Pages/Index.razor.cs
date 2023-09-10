@@ -1,6 +1,7 @@
 ﻿using ImminentCrash.Contracts;
 using ImminentCrash.Contracts.Model;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Reflection;
 
 namespace ImminentCrash.Client.Pages;
@@ -12,6 +13,10 @@ public partial class Index : IDisposable
     [Inject] public IImminentCrashService Client { get; set; } = default!;
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+
+    [Inject] public IJSRuntime JSRuntime { get; set; } = default!;
+
+    private bool hasEnabledAudio = false;
 
 
     private bool _disposedValue;
@@ -71,4 +76,11 @@ public partial class Index : IDisposable
         Logger.LogInformation("Navigating to HighScore");
         NavigationManager.NavigateTo("/HighScore");
     }
+
+    public async void OnEnableAudio()
+    {
+        hasEnabledAudio = true;
+        await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "MenuMusic");
+    }
 }
+

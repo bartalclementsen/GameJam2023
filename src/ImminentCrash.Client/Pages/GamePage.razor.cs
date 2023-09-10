@@ -1,12 +1,9 @@
-﻿using ImminentCrash.Contracts;
-using Microsoft.AspNetCore.Components;
-using System.Reflection;
-using System;
-using System.IO;
-using ImminentCrash.Contracts.Model;
-using Microsoft.Extensions.Logging;
-using Grpc.Core;
+﻿using Grpc.Core;
 using ImminentCrash.Client.Components;
+using ImminentCrash.Contracts;
+using ImminentCrash.Contracts.Model;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using static ImminentCrash.Client.Components.CoinOverviewComponent;
 
 namespace ImminentCrash.Client.Pages;
@@ -20,6 +17,8 @@ public partial class GamePage
     [Inject] public IImminentCrashService Client { get; set; } = default!;
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+
+    [Inject] public IJSRuntime JSRuntime { get; set; } = default!;
 
     private bool _isPaused;
 
@@ -63,13 +62,15 @@ public partial class GamePage
         Logger.LogInformation("Game started");
 
         HandleStream(stream);
+
+        StartRadomSoundTimer();
     }
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         Logger.LogInformation("Trying to start game");
 
-        return base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 
     protected virtual void Dispose(bool disposing)
@@ -86,6 +87,18 @@ public partial class GamePage
             }
 
             _disposedValue = true;
+        }
+    }
+
+    private async void StartRadomSoundTimer()
+    {
+        while (_isDead == false && _isWinner == false && _cancellationTokenSource.Token.IsCancellationRequested == false)
+        {
+            await Task.Delay(Random.Shared.Next(3000, 9000), _cancellationTokenSource.Token);
+            if (_isPaused == false)
+            {
+                await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "coinDrop");
+            }
         }
     }
 
@@ -106,11 +119,14 @@ public partial class GamePage
                 {
                     // TODO: Show dead screen
                     Logger.LogInformation("You are dead");
+
+                    await JSRuntime.InvokeVoidAsync("audioFunctions.stopAudio", "mainSong");
+                    await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "deathSound");
                     //NavigationManager.NavigateTo("/");
                 }
             }
         }
-        catch(RpcException rpcException)
+        catch (RpcException rpcException)
         {
             // Game quit
             Logger.LogError(rpcException, "Error handeling Game Event");
@@ -137,7 +153,7 @@ public partial class GamePage
         if (gameEvent.IsWinner == true)
             _isWinner = true;
 
-        if(_isDead || _isWinner)
+        if (_isDead || _isWinner)
         {
             _highscoreResponse = await Client.GetHighscoreAsync(new GetHighscoreRequest()
             {
@@ -190,7 +206,7 @@ public partial class GamePage
 
     private async void OnSaveHighScore()
     {
-        if(_isDead == false && _isWinner == false)
+        if (_isDead == false && _isWinner == false)
         {
             // Can not save unless dead or winner
             return;

@@ -1,10 +1,14 @@
-﻿@foreach (Event eventObject in Events)
+﻿@inject IJSRuntime JSRuntime;
+
+@foreach (Event eventObject in Events)
 {
     <div class="event">
         <h5>@eventObject.Title</h5>
         <span>@eventObject.Details</span>
     </div>
 }
+
+<audio src="/audio/notification.mp3" id="notificationAudio" ></audio>
 
 @code {
     private List<Event> Events = new List<Event>();
@@ -14,7 +18,7 @@
         Events = new List<Event>();
     }
 
-    internal void HandleNewGameEvent(GameEvent gameEvent)
+    internal async void HandleNewGameEvent(GameEvent gameEvent)
     {
         if (gameEvent.NewEvents != null)
         {
@@ -27,6 +31,7 @@
                 }
             }
             StateHasChanged();
+            await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "notificationAudio");
         }
     }
 }
