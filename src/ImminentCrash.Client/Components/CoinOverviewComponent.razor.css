@@ -45,6 +45,12 @@
     text-align: center;
 }
 
+    .coin .coin-row .element-row .button:disabled {
+        background-color: gray !important;
+        cursor: auto;
+        border-color: black;
+    }
+
     .coin .coin-row .element-row .button:hover {
         border-color: orange;
     }

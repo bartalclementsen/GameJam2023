@@ -424,7 +424,7 @@ namespace ImminentCrash.Server.Services
                 balanceMovement.Add(new BalanceMovement
                 {
                     Amount = buyOrder.Price * -1,
-                    Name = ""
+                    Name = $"Buy ${buyOrder.Amount} of coin"
                 });
             }
         }
@@ -446,7 +446,7 @@ namespace ImminentCrash.Server.Services
                 balanceMovement.Add(new BalanceMovement
                 {
                     Amount = price,
-                    Name = ""
+                    Name = $"Sell ${sellOrder.Amount} of coin"
                 });
             }
         }

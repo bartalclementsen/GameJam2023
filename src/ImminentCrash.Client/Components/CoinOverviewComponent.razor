@@ -6,14 +6,14 @@
         </div>
         <div class="coin-row">
             <div class="element-row">
-                <input type="button" class="button buy" @onclick="() => Buy(coin.Id, 1)" value="+1" />
-                <input type="button" class="button buy" @onclick="() => Buy(coin.Id, 10)" value="+10" />
-                <input type="button" class="button buy" @onclick="() => Buy(coin.Id, 100)" value="+100" />
+                <input type="button" class="button buy" disabled="@(coin.CanBuy1 == false)" @onclick="() => Buy(coin, 1)" value="+1" />
+                <input type="button" class="button buy" disabled="@(coin.CanBuy10 == false)" @onclick="() => Buy(coin, 10)" value="+10" />
+                <input type="button" class="button buy" disabled="@(coin.CanBuy100 == false)" @onclick="() => Buy(coin, 100)" value="+100" />
             </div>
             <div class="element-row">
-                <input type="button" class="button sell" @onclick="() => Sell(coin.Id, 1)" value="-1" />
-                <input type="button" class="button sell" @onclick="() => Sell(coin.Id, 10)" value="-10" />
-                <input type="button" class="button sell" @onclick="() => Sell(coin.Id, 100)" value="-100" />
+                <input type="button" class="button sell" disabled="@(coin.CanSell1 == false)" @onclick="() => Sell(coin, 1)" value="-1" />
+                <input type="button" class="button sell" disabled="@(coin.CanSell10 == false)" @onclick="() => Sell(coin, 10)" value="-10" />
+                <input type="button" class="button sell" disabled="@(coin.CanSell100 == false)" @onclick="() => Sell(coin, 100)" value="-100" />
             </div>
             <div class="element-row">
                 <div class="coin-amount" title="@coin.Amount">
@@ -27,9 +27,7 @@
     </div>
 }
 
-
 @code {
-
     [Parameter]
     public EventCallback<CoinOrder> OnBuy { get; set; }
 
@@ -70,11 +68,18 @@
                 ?.Apply(coinAmount);
         }
 
-        if (gameEvent.NewCoins != null || gameEvent.RemoveCoins != null || gameEvent.CoinAmounts != null)
+        // Apply can move
+        foreach (var coin in coins)
         {
-            StateHasChanged();
+            var coinMovement = gameEvent.CoinMovements?.FirstOrDefault(c => c.Id == coin.Id);
+            var amount = coinMovement?.Amount ?? 0;
+
+            coin.CanBuy1 = amount * 1 <= gameEvent.CurrentBalance;
+            coin.CanBuy10 = amount * 10 <= gameEvent.CurrentBalance;
+            coin.CanBuy100 = amount * 100 <= gameEvent.CurrentBalance;
         }
-        
+
+        StateHasChanged();
     }
 
     private string GetIconLink(string coinName)
@@ -101,25 +106,43 @@
         };
     }
 
-    private async void Buy(int coinId, int amount)
+    private async void Buy(DataItem coin, int amount)
     {
+        if (coin.CanBuy1 == false)
+            return;
+
+        if (coin.CanBuy10 == false && amount == 10)
+            return;
+
+        if (coin.CanBuy100 == false && amount == 100)
+            return;
+
         if (OnBuy.HasDelegate)
         {       
             await OnBuy.InvokeAsync(new CoinOrder()
             {
-                CoinId = coinId,
+                CoinId = coin.Id,
                 Amount = amount
             });
         }
     }
 
-    private async void Sell(int coinId, int amount)
+    private async void Sell(DataItem coin, int amount)
     {
+        if (coin.CanSell1 == false)
+            return;
+
+        if (coin.CanSell10 == false && amount == 10)
+            return;
+
+        if (coin.CanSell100 == false && amount == 100)
+            return;
+
         if(OnSell.HasDelegate)
         {
             await OnSell.InvokeAsync(new CoinOrder()
             {
-                CoinId = coinId,
+                    CoinId = coin.Id,
                 Amount = amount
             });
         }
@@ -143,6 +166,18 @@
 
         public decimal Value { get; set; }
 
+        public bool CanBuy1 { get; set; }
+
+        public bool CanBuy10 { get; set; }
+
+        public bool CanBuy100 { get; set; }
+
+        public bool CanSell1 => Amount >= 1;
+
+        public bool CanSell10 => Amount >= 10;
+
+        public bool CanSell100 => Amount >= 100;
+
         public DataItem(Coin coin)
         {
             Id = coin.Id;
@@ -154,5 +189,6 @@
             Amount = coinAmount.Amount;
             Value = coinAmount.Value;
         }
+
     }
 }
