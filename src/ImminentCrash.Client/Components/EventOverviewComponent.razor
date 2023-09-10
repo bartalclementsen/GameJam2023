@@ -1,12 +1,8 @@
-﻿<h3>Event overview</h3>
-
-@foreach (Event eventObject in Events)
+﻿@foreach (Event eventObject in Events)
 {
-    <div style="border: 1px solid #000000;">
-        <div style="padding: 8px;">
-            <h5>@eventObject.Title</h5>
-            <span>@eventObject.Details</span>
-        </div>
+    <div class="event">
+        <h5>@eventObject.Title</h5>
+        <span>@eventObject.Details</span>
     </div>
 }
 
