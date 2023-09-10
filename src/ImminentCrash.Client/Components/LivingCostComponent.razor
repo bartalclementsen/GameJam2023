@@ -1,30 +1,35 @@
 ﻿<div>
     <h3 style="text-decoration: underline;">Living Cost</h3>
 
-    @foreach (LivingCost eventObject in Events)
+    @foreach (DataItem livingCostObject in LivingCosts)
     {
         <div style="margin-bottom: 16px;">
-            <span>@eventObject.Name:</span>
-            <span>$@eventObject.Amount</span>
+            <span>@livingCostObject.Name:</span>
+            <span>$@livingCostObject.Amount</span>
         </div>
     }
 </div>
 
 @code {
-    private List<LivingCost> Events = new List<LivingCost>();
+    private List<DataItem> LivingCosts = new();
 
     protected override void OnInitialized()
     {
-        Events = new List<LivingCost>();
+        LivingCosts = new();
     }
 
     internal void HandleNewGameEvent(GameEvent gameEvent)
     {
-        if(gameEvent.NewLivingCosts != null)
+        if (gameEvent.ChangedLivingCosts != null)
         {
-            foreach (LivingCost livingCost in gameEvent.NewLivingCosts)
+            foreach (LivingCost livingCost in gameEvent.ChangedLivingCosts)
             {
-                Events.Add(livingCost);
+                DataItem? dataItem = LivingCosts.FirstOrDefault(lc => lc.Name == livingCost.Name);
+
+                if (dataItem != null)
+                {
+                    dataItem.Amount = Math.Round(livingCost.Amount, 2);
+                }
             }
         }
 
@@ -32,9 +37,33 @@
         {
             foreach (LivingCost livingCost in gameEvent.RemoveLivingCosts)
             {
-                Events.Remove(livingCost);
+                LivingCosts.Remove(new DataItem(livingCost));
             }
         }
+
+        if(gameEvent.NewLivingCosts != null)
+        {
+            foreach (LivingCost livingCost in gameEvent.NewLivingCosts)
+            {
+                LivingCosts.Add(new DataItem(livingCost));
+            }
+        }
+
+
         StateHasChanged();
+    }
+
+    private class DataItem
+    {
+        public string Name { get; set; } = string.Empty;
+        public decimal Amount { get; set; } = 0;
+        public LivingCostType LivingCostType { get; set; } = LivingCostType.Daily;
+
+        public DataItem(LivingCost livingCost)
+        {
+            Name = livingCost.Name;
+            Amount = Math.Round(livingCost.Amount, 2);
+            LivingCostType = livingCost.LivingCostType;
+        }
     }
 }
