@@ -1,25 +1,27 @@
-﻿<h3>Coin overview</h3>
-
-@foreach(Coin coin in Coins)
+﻿@foreach(Coin coin in Coins)
 {
-    <div style="display: flex; margin-bottom: 16px;">
-        <div>
-            <img src="@GetIconLink(coin.Name)" style="height: 55px;margin-right: 10px;margin-top: 25px;">
+    <div class="coin">
+        <div class="coin-row">
+            <img src="@GetIconLink(coin.Name)">
         </div>
-        <div>
-            <div style="margin-bottom: 8px;">
-                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Buy(coin.Id, 1)">+1</button>
-                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Buy(coin.Id,10)">+10</button>
-                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Buy(coin.Id,100)">+100</button>
+        <div class="coin-row">
+            <div class="element-row">
+                <input type="button" class="button buy" @onclick="() => Buy(coin.Id, 1)" value="+1" />
+                <input type="button" class="button buy" @onclick="() => Buy(coin.Id, 10)" value="+10" />
+                <input type="button" class="button buy" @onclick="() => Buy(coin.Id, 100)" value="+10" />
             </div>
-            <div style="margin-bottom: 8px;">
-                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Sell(coin.Id, 1)">-1</button>
-                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Sell(coin.Id, 10)">-10</button>
-                <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Sell(coin.Id, 100)">-100</button>
+            <div class="element-row">
+                <input type="button" class="button sell" @onclick="() => Sell(coin.Id, 1)" value="-1" />
+                <input type="button" class="button sell" @onclick="() => Sell(coin.Id, 10)" value="-10" />
+                <input type="button" class="button sell" @onclick="() => Sell(coin.Id, 100)" value="-10" />
             </div>
-            <div style="display: flex;">
-                <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="#@coin.Id" readonly>
-                <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="$@coin.Name" readonly>
+            <div class="element-row">
+                <div class="coin-info">
+                    @coin.Id
+                </div>
+                <div class="coin-info">
+                    @coin.Name
+                </div>
             </div>
         </div>
     </div>

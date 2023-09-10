@@ -21,6 +21,8 @@ public partial class GamePage
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
+    private bool _isPaused;
+
     private bool _isDead;
 
     private bool _disposedValue;
@@ -139,11 +141,15 @@ public partial class GamePage
     private async void OnPauseGameClicked()
     {
         await Client.PauseGameAsync(new PauseGameRequest() { SessionId = SessionId }, _cancellationTokenSource.Token);
+        _isPaused = true;
+        StateHasChanged();
     }
 
     private async void OnContinueGameClicked()
     {
         await Client.ContinueGameAsync(new ContinueGameRequest() { SessionId = SessionId }, _cancellationTokenSource.Token);
+        _isPaused = false;
+        StateHasChanged();
     }
 
     private async void OnBuy(CoinOrder order)
