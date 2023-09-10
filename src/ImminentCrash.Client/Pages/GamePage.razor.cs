@@ -30,6 +30,8 @@ public partial class GamePage
 
     private string _highScoreName = default!;
 
+    private int _daysAlive = default!;
+
     private HighscoreResponse? _highscoreResponse;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -37,7 +39,6 @@ public partial class GamePage
     private EventOverviewComponent EventOverviewComponentRef = default!;
     private CoinOverviewComponent CoinOverviewComponentRef = default!;
     private LivingCostComponent LivingCostComponentRef = default!;
-    private BoosterOverviewComponent BoosterOverviewComponentRef = default!;
     private BalanceComponent BalanceComponentRef = default!;
     private LineChartComponent LineChartComponentRef = default!;
 
@@ -140,10 +141,11 @@ public partial class GamePage
 
     private async Task HandleEvent(GameEvent gameEvent)
     {
+        _daysAlive++;
+
         EventOverviewComponentRef.HandleNewGameEvent(gameEvent);
         CoinOverviewComponentRef.HandleNewGameEvent(gameEvent);
         LivingCostComponentRef.HandleNewGameEvent(gameEvent);
-        //BoosterOverviewComponentRef.HandleNewGameEvent(gameEvent);
         BalanceComponentRef.HandleNewGameEvent(gameEvent);
         LineChartComponentRef.OnGameEvent(gameEvent);
 
@@ -159,9 +161,9 @@ public partial class GamePage
             {
                 SessionId = SessionId
             });
-
-            StateHasChanged();
         }
+
+        StateHasChanged();
     }
 
     private async void OnQuitGameClicked()
