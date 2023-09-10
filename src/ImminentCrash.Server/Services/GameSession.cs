@@ -100,6 +100,41 @@ namespace ImminentCrash.Server.Services
                 // Get living costs
                 GenerateLivingCostForTicks(newLivingCosts, changedLivingCosts);
 
+                
+                // Generate Coin Movements
+                //List<Contracts.Model.Coin> RemoveCoins = new List<Contracts.Model.Coin>();
+
+                CoinData? coinData = null;
+                if (_coinDataByDate.ContainsKey(_currentDate))
+                {
+                    coinData = _coinDataByDate[_currentDate];
+                }
+
+                GenerateCoinMovements(coinMovements, newCoins, coinData);
+
+                // Generate Coin Amounts and
+                foreach(var coinAmount in _coinAmounts)
+                {
+                    CoinMovement? foundMovement = coinMovements.FirstOrDefault(c => c.Id == coinAmount.Key);
+                    var previousCoinAmount = _previousEvent?.CoinAmounts?.FirstOrDefault(c => c.CoinId == coinAmount.Key);
+
+                    var currentCoinAmount = new CoinAmount()
+                    {
+                        CoinId = coinAmount.Key,
+                        Amount = coinAmount.Value,
+                        Value = foundMovement == null ? 0 : foundMovement.Amount * coinAmount.Value
+                    };
+
+                    if(previousCoinAmount != currentCoinAmount)
+                    {
+                        coinAmounts.Add(currentCoinAmount);
+                    }
+                }
+
+                // Generate Event for tick
+                GenerateEventsForTicks(newEvents, coinData, balanceMovement, newLivingCosts, changedLivingCosts);
+
+                
                 int daysDifference = _currentDate.DayNumber - _startDate.DayNumber;
                 // Generate costs for tick
                 foreach (LivingCost livingCost in livingCosts)
@@ -134,42 +169,6 @@ namespace ImminentCrash.Server.Services
 
                 // Apply cost
                 _gameSessionState.CurrentBalance += balanceMovement.Sum(o => o.Amount);
-
-                // Generate Coin Movements
-                //List<Contracts.Model.Coin> RemoveCoins = new List<Contracts.Model.Coin>();
-
-                CoinData? coinData = null;
-                if (_coinDataByDate.ContainsKey(_currentDate))
-                {
-                    coinData = _coinDataByDate[_currentDate];
-                }
-
-                GenerateCoinMovements(coinMovements, newCoins, coinData);
-
-                // Generate Coin Amounts and
-                foreach(var coinAmount in _coinAmounts)
-                {
-                    CoinMovement? foundMovement = coinMovements.FirstOrDefault(c => c.Id == coinAmount.Key);
-                    var previousCoinAmount = _previousEvent?.CoinAmounts?.FirstOrDefault(c => c.CoinId == coinAmount.Key);
-
-                    var currentCoinAmount = new CoinAmount()
-                    {
-                        CoinId = coinAmount.Key,
-                        Amount = coinAmount.Value,
-                        Value = foundMovement == null ? 0 : foundMovement.Amount * coinAmount.Value
-                    };
-
-                    if(previousCoinAmount != currentCoinAmount)
-                    {
-                        coinAmounts.Add(currentCoinAmount);
-                    }
-                }
-
-
-
-
-                // Generate Event for tick
-                GenerateEventsForTicks(newEvents, coinData);
 
                 GameEvent gameEvent = new()
                 {
@@ -351,7 +350,7 @@ namespace ImminentCrash.Server.Services
             }
         }
 
-        private void GenerateEventsForTicks(List<Event> newEvents, CoinData? coinData)
+        private void GenerateEventsForTicks(List<Event> newEvents, CoinData? coinData, List<BalanceMovement> balanceMovement, List<LivingCost> newLivingCosts, List<LivingCost> changedLivingCosts)
         {
             //IEnumerable<GameEvent> lastFiveGameEvents = _events.Values.TakeLast(5);
             // Check if a Event has been generated for the last five GameEvents
@@ -363,6 +362,88 @@ namespace ImminentCrash.Server.Services
             //        newEvents.Add(new Event() { Title = "Coin rising!", Details = $"{highestIncreaseCoin} is going to the moon!" });
             //    }
             //}
+
+            int daysDifference = _currentDate.DayNumber - _startDate.DayNumber;
+            
+            if(daysDifference == 0)
+            {
+                newEvents.Add(new Event() { Title = "Game started!", Details = $"The player has entered the crpyto market!" });
+            }
+
+            if (daysDifference == 5)
+            {
+                newEvents.Add(new Event() { Title = "Freezer!", Details = $"Tú ert ein frystiboks! You felt a sudden urge to buy a freezer costing $1000." });
+                balanceMovement.Add(new BalanceMovement()
+                {
+                    Amount = 1000 * -1,
+                    Name = "Bought a freezer"
+                });
+            }
+
+            if (daysDifference == 15)
+            {
+                newEvents.Add(new Event() { Title = "New Car!", Details = $"You bought a new can because the investing is doing so well! New monthly payment of $2000." });
+                LivingCost car = new()
+                {
+                    Amount = 2000,
+                    LivingCostType = LivingCostType.Monthly,
+                    Name = "Car payments"
+                };
+
+                newLivingCosts.Add(car);
+                livingCosts.Add(car);
+            }
+
+            if (daysDifference == 25)
+            {
+                newEvents.Add(new Event() { Title = "Message from Ex-Girlfriend!", Details = $"I'm pragnant! You need to buy diapers. They cost £500 dollars a week." });
+                LivingCost car = new()
+                {
+                    Amount = 2000,
+                    LivingCostType = LivingCostType.Weekly,
+                    Name = "Diapers"
+                };
+            }
+
+            if (daysDifference == 35)
+            {
+                newEvents.Add(new Event() { Title = "Birthday!", Details = $"It's your birthday today. Your grandmother gave you $2000 dollars." });
+                balanceMovement.Add(new BalanceMovement()
+                {
+                    Amount = 2000,
+                    Name = "Birthday"
+                });
+            }
+
+            if (daysDifference == 50)
+            {
+                newEvents.Add(new Event() { Title = "Parking Ticket!", Details = $"You parked in a disabled spot and got a parking ticket for $200!" });
+                balanceMovement.Add(new BalanceMovement()
+                {
+                    Amount = 200 * -1,
+                    Name = "Parking Ticket"
+                });
+            }
+
+            if (daysDifference == 60)
+            {
+                newEvents.Add(new Event() { Title = "Dentist!", Details = $"You needed to go to the dentist. The cost was $1500 dollars" });
+                balanceMovement.Add(new BalanceMovement()
+                {
+                    Amount = 1500 * -1,
+                    Name = "Dentist"
+                });
+            }
+
+            if (daysDifference == 70)
+            {
+                newEvents.Add(new Event() { Title = "Computer!", Details = $"Oh no! Your gaming computer doesn't work anymore. A new Computer costs $10000." });
+                balanceMovement.Add(new BalanceMovement()
+                {
+                    Amount = 10000 * -1,
+                    Name = "Bought a freezer"
+                });
+            }
         }
 
         private void GenerateLivingCostForTicks(List<LivingCost> newLivingCosts, List<LivingCost> changedLivingCosts)
@@ -380,7 +461,7 @@ namespace ImminentCrash.Server.Services
             {
                 Amount = 2000,
                 LivingCostType = LivingCostType.Monthly,
-                Name = "Car payments"
+                Name = "Rent payments"
             };
 
             if (livingCosts.Any(lc => lc.Name == "Daily costs") == false)
@@ -397,7 +478,7 @@ namespace ImminentCrash.Server.Services
                 changedLivingCosts.Add(tempDaily);
             }
 
-            if (livingCosts.Any(lc => lc.Name == "Car payments") == false)
+            if (livingCosts.Any(lc => lc.Name == "Rent payments") == false)
             {
                 newLivingCosts.Add(car);
                 livingCosts.Add(car);
