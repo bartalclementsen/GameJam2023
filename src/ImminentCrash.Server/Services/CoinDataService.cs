@@ -16,6 +16,7 @@ namespace ImminentCrash.Server.Services
         private IEnumerable<CoinData> _coinData = Enumerable.Empty<CoinData>();
         private DateOnly _minDate;
         private DateOnly _maxDate;
+        private int index = 1;
 
         public async Task InitializeAsync(CancellationToken cancellationToken = default)
         {
@@ -39,22 +40,22 @@ namespace ImminentCrash.Server.Services
                     CoinData coinData = new()
                     {
                         Date = DateOnly.Parse(dateString),
-                        BinanceCoin = GetDecimal(coinValues, "Binance Coin"),
-                        Bitcoin = GetDecimal(coinValues, "Bitcoin"),
-                        Cardano = GetDecimal(coinValues, "Cardano"),
-                        Chainlink = GetDecimal(coinValues, "Chainlink"),
-                        CryptoComCoin = GetDecimal(coinValues, "Crypto.com Coin"),
-                        Dogecoin = GetDecimal(coinValues, "Dogecoin"),
-                        Eos = GetDecimal(coinValues, "EOS"),
+                        BinanceCoin = GetDecimal(coinValues, "Binance Coin") * index,
+                        Bitcoin = GetDecimal(coinValues, "Bitcoin") * index,
+                        Cardano = GetDecimal(coinValues, "Cardano") * index,
+                        Chainlink = GetDecimal(coinValues, "Chainlink") * index,
+                        CryptoComCoin = GetDecimal(coinValues, "Crypto.com Coin") * index,
+                        Dogecoin = GetDecimal(coinValues, "Dogecoin") * index,
+                        Eos = GetDecimal(coinValues, "EOS") * index,
                         Ethereum = GetDecimal(coinValues, "Ethereum"),
-                        Iota = GetDecimal(coinValues, "IOTA"),
-                        Litecoin = GetDecimal(coinValues, "Litecoin"),
-                        Monero = GetDecimal(coinValues, "Monero"),
-                        Nem = GetDecimal(coinValues, "NEM"),
-                        Stellar = GetDecimal(coinValues, "Stellar"),
-                        Tether = GetDecimal(coinValues, "Tether"),
-                        Tron = GetDecimal(coinValues, "TRON"),
-                        Xrp = GetDecimal(coinValues, "XRP")
+                        Iota = GetDecimal(coinValues, "IOTA") * index,
+                        Litecoin = GetDecimal(coinValues, "Litecoin") * index,
+                        Monero = GetDecimal(coinValues, "Monero") * index,
+                        Nem = GetDecimal(coinValues, "NEM") * index,
+                        Stellar = GetDecimal(coinValues, "Stellar") * index,
+                        Tether = GetDecimal(coinValues, "Tether") * index,
+                        Tron = GetDecimal(coinValues, "TRON") * index,
+                        Xrp = GetDecimal(coinValues, "XRP") * index
                     };
                     coinDatas.Add(coinData);
                 }

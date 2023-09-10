@@ -160,7 +160,7 @@ namespace ImminentCrash.Client.Components
         private void AddCoin(CoinType coinType)
         {
             var emptyData = Enumerable.Range(0, _daysToSeeInThePast)
-                .Select(e => 0m)
+                .Select(e => (object)null)
                 .Cast<object>()
                 .ToList();
 
