@@ -1,13 +1,11 @@
 ﻿.coin {
-    margin-top: 1em;
-    margin-left: 5%;
+    margin: 20px 5%;
     width: 90%;
     display: flex;
-    margin-bottom: 16px;
-    padding: 1em;
-    border: 1px solid black;
-    border-radius: 15px;
+    margin-bottom: 6px;
     gap: 1em;
+    border: none;
+    padding: 0 10px;
 }
 
 .coin .coin-row {
@@ -15,8 +13,15 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
 }
+
+    .coin .coin-row img {
+        border-radius: 50px;
+        box-shadow: -1px -1px 18px -2px rgba(0,0,0,0.75);
+        -webkit-box-shadow: -1px -1px 18px -2px rgba(0,0,0,0.75);
+        -moz-box-shadow: -1px -1px 18px -2px rgba(0,0,0,0.75);
+    }
 
 .coin .coin-row:first-of-type {
     width: 50px;
@@ -28,6 +33,9 @@
     padding-bottom: 0.5em;
     gap: 0.5em;
 }
+    .coin .coin-row .element-row:last-child {
+        padding-bottom: 0;
+    }
 
 .coin .coin-row .element-row .button {
     border: 1px solid black;
@@ -37,6 +45,22 @@
     text-align: center;
 }
 
+    .coin .coin-row .element-row .button:hover {
+        border-color: orange;
+    }
+
+    .coin .coin-row .element-row .buy.button:active {
+        box-shadow: 0 2px #666;
+        transform: translateY(1px);
+    }
+
+    .coin .coin-row .element-row .sell.button:active {
+        box-shadow: 0 2px #666;
+        transform: translateY(1px);
+    }
+
+
+
 .coin .coin-row .element-row .buy {
     background-color: green;
 }
@@ -45,11 +69,24 @@
     background-color: red;
 }
 
-.coin .coin-row  .element-row .coin-info {
-    border: 1px solid black;
-    border-radius: 8px;
-    width: 100%;
-    color: white;
-    text-align: center;
-    background-color: unset;
-}
+    .coin .coin-row .element-row .coin-amount {
+        border: 1px solid black;
+        border-radius: 8px;
+        width: 50%;
+        color: black;
+        text-align: center;
+        background-color: white;
+        font-weight: bold;
+        text-overflow: ellipsis;
+    }
+
+    .coin .coin-row .element-row .coin-value {
+        border: 1px solid black;
+        border-radius: 8px;
+        width: 100%;
+        color: black;
+        text-align: center;
+        background-color: white;
+        font-weight:bold;
+        text-overflow:ellipsis;
+    }

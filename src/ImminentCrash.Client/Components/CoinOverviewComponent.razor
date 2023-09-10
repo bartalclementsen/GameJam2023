@@ -2,24 +2,24 @@
 {
     <div class="coin">
         <div class="coin-row">
-            <img src="@GetIconLink(coin.Name)">
+            <img src="@GetIconLink(coin.Name)" title="@coin.Name" />
         </div>
         <div class="coin-row">
             <div class="element-row">
                 <input type="button" class="button buy" @onclick="() => Buy(coin.Id, 1)" value="+1" />
                 <input type="button" class="button buy" @onclick="() => Buy(coin.Id, 10)" value="+10" />
-                <input type="button" class="button buy" @onclick="() => Buy(coin.Id, 100)" value="+10" />
+                <input type="button" class="button buy" @onclick="() => Buy(coin.Id, 100)" value="+100" />
             </div>
             <div class="element-row">
                 <input type="button" class="button sell" @onclick="() => Sell(coin.Id, 1)" value="-1" />
                 <input type="button" class="button sell" @onclick="() => Sell(coin.Id, 10)" value="-10" />
-                <input type="button" class="button sell" @onclick="() => Sell(coin.Id, 100)" value="-10" />
+                <input type="button" class="button sell" @onclick="() => Sell(coin.Id, 100)" value="-100" />
             </div>
             <div class="element-row">
-                <div class="coin-info">
+                <div class="coin-amount" title="@coin.Amount">
                     @coin.Amount
                 </div>
-                <div class="coin-info">
+                <div class="coin-value" style="color: @(coin.Value < 0 ? "red" : "green")" title="@coin.Value">
                     $@coin.Value.ToString("0.00")
                 </div>
             </div>
