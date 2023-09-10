@@ -1,6 +1,7 @@
 ﻿using ImminentCrash.Contracts.Model;
 using ImminentCrash.Server.Model;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 namespace ImminentCrash.Server.Services
 {
@@ -96,25 +97,39 @@ namespace ImminentCrash.Server.Services
                 _currentDate = _currentDate.AddDays(1);
 
                 // Get living costs
-                LivingCost livingCost = new()
-                {
-                    Amount = 20,
-                    LivingCostType = LivingCostType.Daily,
-                    Name = "Living Costs"
-                };
+                GenerateLivingCostForTicks(newLivingCosts);
 
-                if (livingCosts.Contains(livingCost) == false)
-                {
-                    newLivingCosts.Add(livingCost);
-                    livingCosts.Add(livingCost);
-                }
-
+                int daysDifference = _currentDate.DayNumber - _startDate.DayNumber;
                 // Generate costs for tick
-                balanceMovement.Add(new BalanceMovement()
+                foreach (LivingCost livingCost in livingCosts)
                 {
-                    Amount = livingCost.Amount * -1,
-                    Name = livingCost.Name
-                });
+                    if (livingCost.LivingCostType == LivingCostType.Daily)
+                    {
+                        balanceMovement.Add(new BalanceMovement()
+                        {
+                            Amount = livingCost.Amount * -1,
+                            Name = livingCost.Name
+                        });
+                    }
+
+                    if (livingCost.LivingCostType == LivingCostType.Weekly && daysDifference % 7 == 0)
+                    {
+                        balanceMovement.Add(new BalanceMovement()
+                        {
+                            Amount = livingCost.Amount * -1,
+                            Name = livingCost.Name
+                        });
+                    }
+
+                    if (livingCost.LivingCostType == LivingCostType.Monthly && daysDifference % 31 == 0)
+                    {
+                        balanceMovement.Add(new BalanceMovement()
+                        {
+                            Amount = livingCost.Amount * -1,
+                            Name = livingCost.Name
+                        });
+                    }
+                }
 
                 // Apply cost
                 _gameSessionState.CurrentBalance += balanceMovement.Sum(o => o.Amount);
@@ -148,6 +163,8 @@ namespace ImminentCrash.Server.Services
                         coinAmounts.Add(currentCoinAmount);
                     }
                 }
+
+
 
 
                 // Generate Event for tick
@@ -343,6 +360,35 @@ namespace ImminentCrash.Server.Services
             //        newEvents.Add(new Event() { Title = "Coin rising!", Details = $"{highestIncreaseCoin} is going to the moon!" });
             //    }
             //}
+        }
+
+        private void GenerateLivingCostForTicks(List<LivingCost> newLivingCosts)
+        {
+            LivingCost daily = new()
+            {
+                Amount = 100,
+                LivingCostType = LivingCostType.Daily,
+                Name = "Daily costs"
+            };
+
+            LivingCost car = new()
+            {
+                Amount = 2000,
+                LivingCostType = LivingCostType.Monthly,
+                Name = "Car payments"
+            };
+
+            if (livingCosts.Contains(daily) == false)
+            {
+                newLivingCosts.Add(daily);
+                livingCosts.Add(daily);
+            }
+
+            if (livingCosts.Contains(car) == false)
+            {
+                newLivingCosts.Add(car);
+                livingCosts.Add(car);
+            }
         }
 
         private void ApplySellOrderFromPreviousDay(List<BalanceMovement> balanceMovement)
