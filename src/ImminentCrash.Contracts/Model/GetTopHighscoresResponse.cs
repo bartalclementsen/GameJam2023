@@ -16,7 +16,7 @@ namespace ImminentCrash.Contracts.Model
     public class HighscoreResponse
     {
         [DataMember(Order = 1)]
-        public DateTime HighscoreDate { get; set; }
+        public string HighscoreDate { get; set; } = default!;
 
         [DataMember(Order = 2)]
         public string Name { get; set; } = string.Empty;

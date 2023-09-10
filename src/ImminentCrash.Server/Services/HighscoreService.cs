@@ -52,7 +52,7 @@ namespace ImminentCrash.Server.Services
                     .Take(10)
                     .Select(e => new HighscoreResponse()
                     {
-                        HighscoreDate = e.HighscoreTime,
+                        HighscoreDate = e.HighscoreTime.ToString("dd/MM/yyyy HH:mm"),
                         Name = e.Name,
                         DaysAlive = e.DaysAlive,
                         CurrentBalance = Math.Round(e.CurrentBalance, 2),
@@ -65,7 +65,7 @@ namespace ImminentCrash.Server.Services
                     .Take(10)
                     .Select(e => new HighscoreResponse()
                     {
-                        HighscoreDate = e.HighscoreTime,
+                        HighscoreDate = e.HighscoreTime.ToString("dd/MM/yyyy HH:mm"),
                         Name = e.Name,
                         DaysAlive = e.DaysAlive,
                         CurrentBalance = Math.Round(e.CurrentBalance, 2),

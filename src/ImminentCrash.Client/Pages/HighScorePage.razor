@@ -30,7 +30,7 @@
                                     <td>@(highscore.Name)</td>
                                     <td>@(highscore.DaysAlive)</td>
                                     <td>@(highscore.HighestBalance)</td>
-                                    <td>@highscore.HighscoreDate.ToString("dd/MM/yyyy hh:mm")</td>
+                                    <td>@highscore.HighscoreDate</td>
                                 </tr>
                             }                        
 
@@ -62,10 +62,9 @@
                                 <td>@(highscore.Name)</td>
                                 <td>@(highscore.DaysAlive)</td>
                                 <td>@(highscore.HighestBalance)</td>
-                                <td>@highscore.HighscoreDate.ToString("dd/MM/yyyy hh:mm")</td>
+                                <td>@highscore.HighscoreDate</td>
                             </tr>
                         }
-
                     }
                 </table>
                 @if (_loosingHighscores is null || _loosingHighscores.Any() == false)
