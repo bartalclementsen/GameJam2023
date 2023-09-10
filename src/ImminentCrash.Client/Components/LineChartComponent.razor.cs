@@ -142,8 +142,6 @@ namespace ImminentCrash.Client.Components
                     while (itemsToRemove-- > 0)
                         lineDataSet.Data.RemoveAt(0);
 
-                    //lineDataSet.PointStyle = new IndexableOption<string>("false");
-
                     chartData[dataset] = new SetDataObject(lineDataSet.Data);
                 }
             }
@@ -168,7 +166,7 @@ namespace ImminentCrash.Client.Components
             {
                 Label = CoinTypeToString(coinType),
                 CubicInterpolationMode = "monotone",
-                PointStyle = new IndexableOption<string>("star"),
+                BorderColor = CoinColors.GetColor((int)coinType - 1),
                 PointRadius = new IndexableOption<double>(0),
                 Data = emptyData
             });
