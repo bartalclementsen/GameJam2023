@@ -23,13 +23,8 @@
         if (gameEvent.NewEvents != null)
         {
             foreach (Event eventObject in gameEvent.NewEvents)
-            {
                 Events.Insert(0, eventObject);
-                if (Events.Count() > 4)
-                {
-                    Events.RemoveAt(4);
-                }
-            }
+
             StateHasChanged();
             await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "notificationAudio");
         }

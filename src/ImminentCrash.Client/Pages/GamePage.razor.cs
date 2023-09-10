@@ -143,7 +143,7 @@ public partial class GamePage
         EventOverviewComponentRef.HandleNewGameEvent(gameEvent);
         CoinOverviewComponentRef.HandleNewGameEvent(gameEvent);
         LivingCostComponentRef.HandleNewGameEvent(gameEvent);
-        BoosterOverviewComponentRef.HandleNewGameEvent(gameEvent);
+        //BoosterOverviewComponentRef.HandleNewGameEvent(gameEvent);
         BalanceComponentRef.HandleNewGameEvent(gameEvent);
         LineChartComponentRef.OnGameEvent(gameEvent);
 

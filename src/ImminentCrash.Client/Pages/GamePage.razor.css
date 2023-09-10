@@ -27,7 +27,7 @@
     height: var(--event-column-height);
     width: var(--left-column-width);
     /*background-color: red;*/
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 .main-container .left-column .living-cost {

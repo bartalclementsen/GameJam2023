@@ -100,7 +100,7 @@ namespace ImminentCrash.Server.Services
                 _currentDate = _currentDate.AddDays(1);
 
                 // Get living costs
-                GenerateLivingCostForTicks(newLivingCosts, changedLivingCosts);
+                GenerateLivingCostForTicks(newLivingCosts, changedLivingCosts, newEvents);
 
                 
                 // Generate Coin Movements
@@ -395,10 +395,10 @@ namespace ImminentCrash.Server.Services
 
             if (daysDifference == 15)
             {
-                newEvents.Add(new Event() { Title = "New Car!", Details = $"You bought a new can because the investing is doing so well! New monthly payment of $2000." });
+                newEvents.Add(new Event() { Title = "New Car!", Details = $"You bought a new car because the investing is doing so well! New monthly payment of $750." });
                 LivingCost car = new()
                 {
-                    Amount = 2000,
+                    Amount = 750,
                     LivingCostType = LivingCostType.Monthly,
                     Name = "Car payments"
                 };
@@ -409,13 +409,16 @@ namespace ImminentCrash.Server.Services
 
             if (daysDifference == 25)
             {
-                newEvents.Add(new Event() { Title = "Message from Ex-Girlfriend!", Details = $"I'm pregnant! You need to buy diapers. They cost £500 dollars a week." });
-                LivingCost car = new()
+                newEvents.Add(new Event() { Title = "Message from Ex-Girlfriend!", Details = $"I'm pregnant! You need to buy diapers. They cost $500 dollars a week." });
+                LivingCost Diapers = new()
                 {
-                    Amount = 2000,
+                    Amount = 500,
                     LivingCostType = LivingCostType.Weekly,
                     Name = "Diapers"
                 };
+
+                newLivingCosts.Add(Diapers);
+                livingCosts.Add(Diapers);
             }
 
             if (daysDifference == 35)
@@ -428,9 +431,13 @@ namespace ImminentCrash.Server.Services
                 });
             }
 
-            if (daysDifference == 50)
+            if (daysDifference == 50 || daysDifference % 90 == 0)
             {
-                newEvents.Add(new Event() { Title = "Parking Ticket!", Details = $"You parked in a disabled spot and got a parking ticket for $200!" });
+                if(daysDifference == 50)
+                {
+                    newEvents.Add(new Event() { Title = "Parking Ticket!", Details = $"You parked in a disabled spot and got a parking ticket for $200!" });
+                }
+
                 balanceMovement.Add(new BalanceMovement()
                 {
                     Amount = 200 * -1,
@@ -438,28 +445,36 @@ namespace ImminentCrash.Server.Services
                 });
             }
 
-            if (daysDifference == 60)
+            if (daysDifference == 60 || daysDifference % 60 == 0)
             {
-                newEvents.Add(new Event() { Title = "Dentist!", Details = $"You needed to go to the dentist. The cost was $1500 dollars" });
+                if(daysDifference == 60)
+                {
+                    newEvents.Add(new Event() { Title = "Dentist!", Details = $"You needed to go to the dentist. The cost was $1500 dollars" });
+                }
+
                 balanceMovement.Add(new BalanceMovement()
                 {
-                    Amount = 1500 * -1,
+                    Amount = 700 * -1,
                     Name = "Dentist"
                 });
             }
 
-            if (daysDifference == 70)
+            if (daysDifference == 70 || daysDifference % 365 == 0)
             {
-                newEvents.Add(new Event() { Title = "Computer!", Details = $"Oh no! Your gaming computer doesn't work anymore. A new Computer costs $10000." });
+                if(daysDifference == 70)
+                {
+                    newEvents.Add(new Event() { Title = "Computer!", Details = $"Oh no! Your gaming computer doesn't work anymore. A new Computer costs $2500." });
+                }
+
                 balanceMovement.Add(new BalanceMovement()
                 {
-                    Amount = 10000 * -1,
-                    Name = "Bought a freezer"
+                    Amount = 2500 * -1,
+                    Name = "Bought a Computer"
                 });
             }
         }
 
-        private void GenerateLivingCostForTicks(List<LivingCost> newLivingCosts, List<LivingCost> changedLivingCosts)
+        private void GenerateLivingCostForTicks(List<LivingCost> newLivingCosts, List<LivingCost> changedLivingCosts, List<Event> newEvents)
         {
             int daysDifference = _currentDate.DayNumber - _startDate.DayNumber;
 
@@ -470,9 +485,9 @@ namespace ImminentCrash.Server.Services
                 Name = "Daily costs"
             };
 
-            LivingCost car = new()
+            LivingCost rent = new()
             {
-                Amount = 2000,
+                Amount = 500,
                 LivingCostType = LivingCostType.Monthly,
                 Name = "Rent payments"
             };
@@ -482,19 +497,57 @@ namespace ImminentCrash.Server.Services
                 newLivingCosts.Add(daily);
                 livingCosts.Add(daily);
             }
-            else if (daysDifference % 7 == 0)
+
+            if (livingCosts.Any(lc => lc.Name == "Rent payments") == false)
+            {
+                newLivingCosts.Add(rent);
+                livingCosts.Add(rent);
+            }
+
+            decimal interestRate = 1.035m;
+            if (daysDifference >= 70)
+            {
+                interestRate = 1.05m;
+                if (daysDifference == 70)
+                {
+                    newEvents.Add(new Event()
+                    {
+                        Title = "Recession?",
+                        Details = "Sources say that a recession might occur, so all the major banks have increased interest rates! interest rate increased to 5%"
+                    });
+
+                }
+            }
+
+            if (daysDifference >= 140)
+            {
+                interestRate = 1.075m;
+                if (daysDifference == 140)
+                {
+                    newEvents.Add(new Event()
+                    {
+                        Title = "Everything's burning",
+                        Details = "When we thought things could not get any worse.... interest rate increased to 7.5%"
+                    });
+                }
+            }
+
+            if (daysDifference % 7 == 0)
             {
                 LivingCost tempDaily = livingCosts.First(lc => lc.Name == daily.Name);
-                tempDaily = tempDaily with { Amount = decimal.Multiply(tempDaily.Amount, 1.1m) };
+                tempDaily = tempDaily with { Amount = decimal.Multiply(tempDaily.Amount, interestRate) };
                 livingCosts.RemoveAll(lc => lc.Name == daily.Name);
                 livingCosts.Add(tempDaily);
                 changedLivingCosts.Add(tempDaily);
             }
 
-            if (livingCosts.Any(lc => lc.Name == "Rent payments") == false)
+            if(daysDifference % 31 == 0)
             {
-                newLivingCosts.Add(car);
-                livingCosts.Add(car);
+                LivingCost tempRent = livingCosts.First(lc => lc.Name == rent.Name);
+                tempRent = tempRent with { Amount = decimal.Multiply(tempRent.Amount, interestRate) };
+                livingCosts.RemoveAll(lc => lc.Name == rent.Name);
+                livingCosts.Add(tempRent);
+                changedLivingCosts.Add(tempRent);
             }
         }
 
