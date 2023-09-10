@@ -25,7 +25,11 @@ public partial class GamePage
 
     private bool _isDead;
 
+    private bool _isWinner;
+
     private bool _disposedValue;
+
+    private string _highScoreName = default!;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
@@ -49,14 +53,14 @@ public partial class GamePage
         Logger.LogInformation("Page Initialized");
 
         Logger.LogInformation("Starting game");
-        IAsyncEnumerable<GameEvent> stream = Client.StartNewGameAsync(new StartGameRequest
-        {
-            SessionId = SessionId,
-        }, _cancellationTokenSource.Token);
+        //IAsyncEnumerable<GameEvent> stream = Client.StartNewGameAsync(new StartGameRequest
+        //{
+        //    SessionId = SessionId,
+        //}, _cancellationTokenSource.Token);
 
         Logger.LogInformation("Game started");
 
-        HandleStream(stream);
+        //HandleStream(stream);
     }
 
     protected override Task OnInitializedAsync()
@@ -125,11 +129,14 @@ public partial class GamePage
         BalanceComponentRef.HandleNewGameEvent(gameEvent);
         LineChartComponentRef.OnGameEvent(gameEvent);
 
-        if(gameEvent.IsDead) 
-        {
+        if (gameEvent.IsDead)
             _isDead = true;
+
+        if (gameEvent.IsWinner == true)
+            _isWinner = true;
+
+        if(_isDead || _isWinner)
             StateHasChanged();
-        }
     }
 
     private async void OnQuitGameClicked()
@@ -170,6 +177,29 @@ public partial class GamePage
             CoinId = order.CoinId,
             SessionId = SessionId
         });
+    }
+
+    private async void OnSaveHighScore()
+    {
+        if(_isDead == false && _isWinner == false)
+        {
+            // Can not save unless dead or winner
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_highScoreName) || _highScoreName.Length < 1)
+        {
+            // send some alert stating name needed
+            return;
+        }
+
+        await Client.CreateHighscoreAsync(new CreateHighscoreRequest()
+        {
+            SessionId = SessionId,
+            Name = _highScoreName
+        });
+
+        NavigationManager.NavigateTo("/HighScore");
     }
 
     private void OnBackToMainMenuClicked()

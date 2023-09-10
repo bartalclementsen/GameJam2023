@@ -23,6 +23,10 @@ namespace ImminentCrash.Server.Services
         Task<BuyCoinsResponse> BuyCoinsAsync(BuyCoinsRequest request, CallContext context);
 
         Task<SellCoinsResponse> SellCoinsAsync(SellCoinRequest request, CallContext context);
+
+        Task CreateHighscoreAsync(CreateHighscoreRequest createHighscoreRequest, CallContext callContext);
+
+        Task<GetTopHighscoresResponse> GetTopHighscoresAsync(GetTopHighscoresRequest getTopHighscoresRequest, CallContext callContext);
     }
 
     public class GameService : IGameService
@@ -32,12 +36,14 @@ namespace ImminentCrash.Server.Services
         private readonly ILogger<GameService> _logger;
         private readonly Func<GameSession> _gameSessionFactory;
         private readonly ICoinDataService _coinDataService;
+        private readonly IHighscoreService _highscoreService;
 
-        public GameService(ILogger<GameService> logger, Func<GameSession> gameSessionFactory, ICoinDataService coinDataService)
+        public GameService(ILogger<GameService> logger, Func<GameSession> gameSessionFactory, ICoinDataService coinDataService, IHighscoreService highscoreService)
         {
-            _logger = logger;
-            _gameSessionFactory = gameSessionFactory;
-            _coinDataService = coinDataService;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _gameSessionFactory = gameSessionFactory ?? throw new ArgumentNullException(nameof(gameSessionFactory));
+            _coinDataService = coinDataService ?? throw new ArgumentNullException(nameof(coinDataService));
+            _highscoreService = highscoreService ?? throw new ArgumentNullException(nameof(highscoreService));
         }
 
         public Task<CreateNewGameResponse> CreateNewGameAsync(CreateNewGameRequest request, CallContext cancellationToken)
@@ -105,6 +111,18 @@ namespace ImminentCrash.Server.Services
             IGameSession gameSession = GetGameSessionByIdOrThrow(request.SessionId);
             await gameSession.SellCoinsAsync(request, context.CancellationToken);
             return new SellCoinsResponse();
+        }
+
+
+        public async Task CreateHighscoreAsync(CreateHighscoreRequest request, CallContext callContext)
+        {
+            IGameSession gameSession = GetGameSessionByIdOrThrow(request.SessionId);
+            await _highscoreService.CreateHighscoreAsync(request, gameSession, callContext.CancellationToken);
+        }
+
+        public async Task<GetTopHighscoresResponse> GetTopHighscoresAsync(GetTopHighscoresRequest request, CallContext callContext)
+        {
+            return await _highscoreService.GetTopHighscoresAsync(request, callContext.CancellationToken);
         }
 
         private IGameSession GetGameSessionByIdOrThrow(Guid sessionId)

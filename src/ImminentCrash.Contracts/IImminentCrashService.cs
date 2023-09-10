@@ -27,5 +27,11 @@ namespace ImminentCrash.Contracts
 
         [OperationContract]
         Task<SellCoinsResponse> SellCoinsAsync(SellCoinRequest request, CallContext context = default);
+
+        [OperationContract]
+        Task CreateHighscoreAsync(CreateHighscoreRequest createHighscoreRequest, CallContext context = default);
+
+        [OperationContract]
+        Task<GetTopHighscoresResponse> GetTopHighscoresAsync(GetTopHighscoresRequest getTopHighscoresRequest, CallContext context = default);
     }
 }
