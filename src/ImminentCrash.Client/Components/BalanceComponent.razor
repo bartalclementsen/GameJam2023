@@ -1,21 +1,25 @@
-﻿<div>
+﻿<div class="balance-component">
     <h3>Balance</h3>
 
-    <div>
+    <div style="height:75px;">
         <span style="font-size: 3em;">$@_bankBalance.ToString("#,##0.00")</span>
-        <span style="border: 1px solid #000000; border-radius: 8px; padding: 3px;background-color: @($"{(_change > 0 ? "green" : "red")}");padding: 1em;">@_change</span>
+    </div>
+
+    <div class="balance-component__balance-movements" style="overflow:hidden">
+        @foreach (var balanceMovement in balanceMovements.Take(5))
+        {
+            <div style="color: @(balanceMovement.Amount < 0 ? "red" : "green" )">@balanceMovement.Name $@balanceMovement.Amount.ToString("#,##0.00")</div>
+        }
     </div>
 </div>
 
-
 @code {
     private decimal _bankBalance { get; set; }
-    private decimal _change { get; set; }
+    private readonly List<BalanceMovement> balanceMovements = new List<BalanceMovement>();
 
     protected override void OnInitialized()
     {
-        _bankBalance = 1000;
-        _change = -10;
+        _bankBalance = 0;
     }
 
     internal void HandleNewGameEvent(GameEvent gameEvent)
@@ -26,7 +30,7 @@
         {
             foreach (BalanceMovement balanceMovement in gameEvent.BalanceMovements)
             {
-                _change = balanceMovement.Amount;
+                balanceMovements.Insert(0, balanceMovement);
             }
         }
         StateHasChanged();
