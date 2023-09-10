@@ -11,8 +11,8 @@ namespace ImminentCrash.Server.Services
 
         public ImminentCrashService(ILogger<ImminentCrashService> logger, IGameService gameService)
         {
-            _gameService = gameService;
-            _logger = logger;
+            _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public Task<ContinueGameResponse> ContinueGameAsync(ContinueGameRequest request, CallContext context = default)
@@ -50,6 +50,16 @@ namespace ImminentCrash.Server.Services
         public Task<BuyCoinsResponse> BuyCoinsAsync(BuyCoinsRequest request, CallContext context = default)
         {
             return _gameService.BuyCoinsAsync(request, context);
+        }
+
+        public Task CreateHighscoreAsync(CreateHighscoreRequest createHighscoreRequest, CallContext context = default)
+        {
+            return _gameService.CreateHighscoreAsync(createHighscoreRequest, context);
+        }
+
+        public Task<GetTopHighscoresResponse> GetTopHighscoresAsync(GetTopHighscoresRequest getTopHighscoresRequest, CallContext context = default)
+        {
+            return _gameService.GetTopHighscoresAsync(getTopHighscoresRequest, context);
         }
     }
 }
