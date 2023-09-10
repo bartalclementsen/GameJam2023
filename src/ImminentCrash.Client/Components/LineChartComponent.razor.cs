@@ -11,8 +11,8 @@ namespace ImminentCrash.Client.Components
         ChartJsConfig chartJsConfig = default!;
         private bool chartReady;
 
-        private int _daysToSeeInThePast = 30;
-        private int _daysToSeeInTheFuture = 20;
+        private int _daysToSeeInThePast = 10;
+        private int _daysToSeeInTheFuture = 5;
         private DateOnly CurrentDate = default!;
 
         /* Overrides */
@@ -36,7 +36,7 @@ namespace ImminentCrash.Client.Components
                             Display = true,
                             Ticks = new ChartJsAxisTick()
                             {
-                                Color = "white",
+                                Color = "black",
                                 Font = new Font()
                                 {
                                     Family = "'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -54,7 +54,7 @@ namespace ImminentCrash.Client.Components
                             Type = "logarithmic",
                             Ticks = new ChartJsAxisTick()
                             {
-                                Color = "white",
+                                Color = "black",
                                 Font = new Font()
                                 {
                                     Family = "'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -63,8 +63,8 @@ namespace ImminentCrash.Client.Components
                             },
                             Grid = new()
                             {
-                                TickColor = "white",
-                                Color = "white",
+                                TickColor = "black",
+                                Color = "black",
                             }
                         },
                     },
@@ -74,13 +74,23 @@ namespace ImminentCrash.Client.Components
                         Legend = new()
                         {
                             Display = false
+                        },
+                        ArbitraryLines = new List<ArbitraryLineConfig>()
+                        {
+                            new ArbitraryLineConfig()
+                            {
+                                ArbitraryLineColor = "black",
+                                XPosition = _daysToSeeInThePast,
+                                XWidth = 2,
+                                Text = string.Empty
+                            }
                         }
                     }
                 }
             };
 
             // Add ur line :)
-            AddArbitraryLine();
+            //AddArbitraryLine();
 
             base.OnInitialized();
         }
@@ -132,7 +142,7 @@ namespace ImminentCrash.Client.Components
                     while (itemsToRemove-- > 0)
                         lineDataSet.Data.RemoveAt(0);
 
-                    lineDataSet.PointStyle = new IndexableOption<string>(GetPointStyle(CoinTypeToEnum(lineDataSet.Label), lineDataSet.Data));
+                    //lineDataSet.PointStyle = new IndexableOption<string>("false");
 
                     chartData[dataset] = new SetDataObject(lineDataSet.Data);
                 }
@@ -157,6 +167,9 @@ namespace ImminentCrash.Client.Components
             chartJsConfig.Data.Datasets.Add(new LineDataset()
             {
                 Label = CoinTypeToString(coinType),
+                CubicInterpolationMode = "monotone",
+                PointStyle = new IndexableOption<string>("star"),
+                PointRadius = new IndexableOption<double>(0),
                 Data = emptyData
             });
         }
@@ -180,28 +193,6 @@ namespace ImminentCrash.Client.Components
                         lineDataSet.Data.Add(Math.Round(dataEntry, 2));
                 }
             }
-        }
-
-        public void AddArbitraryLine()
-        {
-            if (chartJsConfig.Options == null)
-                chartJsConfig.Options = new();
-
-            if (chartJsConfig.Options.Plugins == null)
-                chartJsConfig.Options.Plugins = new();
-
-            chartJsConfig.Options.Plugins.ArbitraryLines = new List<ArbitraryLineConfig>()
-        {
-            new ArbitraryLineConfig()
-            {
-                ArbitraryLineColor = "black",
-                XPosition = _daysToSeeInThePast,
-                XWidth = 2,
-                Text = string.Empty
-            }
-        };
-
-            chartJsConfig.UpdateChartOptions();
         }
 
         private List<string> BuildDays(DateOnly date)
@@ -231,7 +222,7 @@ namespace ImminentCrash.Client.Components
                 return new();
 
             List<string> ret = new(dataset.Count);
-            Enumerable.Range(0, dataset.Count() - 1).ToList().ForEach(e => ret.Add("circle"));
+            Enumerable.Range(0, dataset.Count() - 1).ToList().ForEach(e => ret.Add("false"));
 
             // For now until we figure out how to add Images to the PointStyle using C# we're just going to default to a triangle :-(
             ret.Add(coinType switch
