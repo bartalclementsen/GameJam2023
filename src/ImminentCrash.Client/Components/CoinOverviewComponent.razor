@@ -1,6 +1,6 @@
 ﻿<h3>Coin overview</h3>
 
-@foreach(Coin coin in Coins)
+@foreach(DataItem coin in coins)
 {
     <div style="display: flex; margin-bottom: 16px;">
         <div>
@@ -18,8 +18,8 @@
                 <button style="border-radius: 8px; background: white; width: 52px;" @onclick="() => Sell(coin.Id, 100)">-100</button>
             </div>
             <div style="display: flex;">
-                <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="#@coin.Id" readonly>
-                <input style="width: 81px;border-radius: 8px;margin-right: 4px;" type="text" value="$@coin.Name" readonly>
+                <input style="width: 60px;border-radius: 8px;margin-right: 4px;" type="text" value="@coin.Amount" readonly>
+                <input style="width: 102px;border-radius: 8px;margin-right: 4px;" type="text" value="$@coin.Value.ToString("0.00")" readonly>
             </div>
         </div>
     </div>
@@ -34,11 +34,11 @@
     [Parameter]
     public EventCallback<CoinOrder> OnSell { get; set; }
 
-    private List<Coin> Coins = new List<Coin>();
+    private List<DataItem> coins = new List<DataItem>();
 
     protected override void OnInitialized()
     {
-        Coins = new List<Coin>();
+        coins = new List<DataItem>();
     }
 
     internal void HandleNewGameEvent(GameEvent gameEvent)
@@ -47,7 +47,7 @@
         {
             foreach (Coin coin in gameEvent.NewCoins)
             {
-                Coins.Add(coin);
+                coins.Add(new DataItem(coin));
             }
         }
 
@@ -55,10 +55,24 @@
         {
             foreach (Coin coin in gameEvent.RemoveCoins)
             {
-                Coins.Remove(coin);
+                var foundCoin = coins.FirstOrDefault(c => c.Id == coin.Id);
+                if(foundCoin != null) 
+                    coins.Remove(foundCoin);
             }
         }
-        StateHasChanged();
+
+        foreach(var coinAmount in gameEvent.CoinAmounts ?? Enumerable.Empty<CoinAmount>())
+        {
+            coins
+                .FirstOrDefault(c => c.Id == coinAmount.CoinId)
+                ?.Apply(coinAmount);
+        }
+
+        if (gameEvent.NewCoins != null || gameEvent.RemoveCoins != null || gameEvent.CoinAmounts != null)
+        {
+            StateHasChanged();
+        }
+        
     }
 
     private string GetIconLink(string coinName)
@@ -115,5 +129,28 @@
         public int CoinId { get; set; }
 
         public int Amount { get; set; }
+    }
+
+    public class DataItem
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+
+        public int Amount { get; set; }
+
+        public decimal Value { get; set; }
+
+        public DataItem(Coin coin)
+        {
+            Id = coin.Id;
+            Name = coin.Name;
+        }
+
+        public void Apply(CoinAmount coinAmount)
+        {
+            Amount = coinAmount.Amount;
+            Value = coinAmount.Value;
+        }
     }
 }

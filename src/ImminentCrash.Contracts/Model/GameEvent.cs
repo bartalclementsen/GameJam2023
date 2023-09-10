@@ -34,6 +34,9 @@ public record GameEvent
 
     [DataMember(Order = 10)]
     public IEnumerable<Event>? NewEvents { get; init; }
+
+    [DataMember(Order = 11)]
+    public IEnumerable<CoinAmount>? CoinAmounts { get; init; }
 }
 
 [DataContract]
@@ -96,5 +99,18 @@ public record Event
 
     [DataMember(Order = 2)]
     public string Details { get; init; } = string.Empty;
+}
+
+[DataContract]
+public record CoinAmount
+{
+    [DataMember(Order = 1)]
+    public int CoinId { get; init; } = 0;
+
+    [DataMember(Order = 2)]
+    public int Amount { get; init; } = 0;
+
+    [DataMember(Order = 3)]
+    public decimal Value { get; init; } = 0;
 }
 
