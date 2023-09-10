@@ -35,6 +35,31 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
+
+    <script>
+        window.audioFunctions = {
+            playAudio: function (audioElementId) {
+                var audioElement = document.getElementById(audioElementId);
+                if (audioElement) {
+                    audioElement.currentTime = 0;
+                    audioElement.play();
+                }
+            },
+            stopAudio: function (audioElementId) {
+                var audioElement = document.getElementById(audioElementId);
+                if (audioElement) {
+                    audioElement.currentTime = 0;
+                    audioElement.pause();
+                }
+            },
+            setVolume: function (audioElementId, volume) {
+                var audioElement = document.getElementById(audioElementId);
+                if (audioElement) {
+                    audioElement.volume = volume;
+                }
+            }
+        };
+    </script>
 </body>
 
 </html>

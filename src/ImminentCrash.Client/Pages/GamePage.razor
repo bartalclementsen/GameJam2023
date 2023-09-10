@@ -59,3 +59,14 @@
         <button @onclick="() => OnBackToMainMenuClicked()" class="button">Back to main menu</button>
     </div>
 </div>
+
+<audio src="/audio/Pixel-Peeker-Polka-faster-kevin-mecleod.mp3" id="mainSong" autoplay loop></audio>
+<audio src="/audio/videogame-death-sound-43894.mp3" id="deathSound"></audio>
+<audio src="/audio/coin-drop.mp3" id="coinDrop"></audio>
+
+<script>
+    var audio = document.getElementById("mainSong");
+    audio.addEventListener("play", function () {
+        audio.volume = 0.1;  // Set volume to 10% when audio starts playing
+    });
+</script>
