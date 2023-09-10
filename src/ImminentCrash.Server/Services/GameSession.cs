@@ -33,7 +33,7 @@ namespace ImminentCrash.Server.Services
         private bool _isPaused = false;
         private CancellationTokenSource _cancellationTokenSource = new();
 
-        private readonly Dictionary<int, int> _coinOwnage = new();
+        private readonly Dictionary<int, int> _coinAmounts = new();
         private readonly List<CoinBuyOrder> _coinBuyOrders = new();
         private readonly List<CoinSellOrder> _coinSellOrders = new();
 
@@ -85,6 +85,7 @@ namespace ImminentCrash.Server.Services
                 List<CoinMovement> coinMovements = new();
                 List<Contracts.Model.Coin> newCoins = new();
                 List<Event> newEvents = new List<Event>();
+                List<CoinAmount> coinAmounts = new List<CoinAmount>();
 
                 ApplyBuyOrderFromPreviousDay(balanceMovement);
 
@@ -129,6 +130,26 @@ namespace ImminentCrash.Server.Services
 
                 GenerateCoinMovements(coinMovements, newCoins, coinData);
 
+                // Generate Coin Amounts and
+                foreach(var coinAmount in _coinAmounts)
+                {
+                    CoinMovement? foundMovement = coinMovements.FirstOrDefault(c => c.Id == coinAmount.Key);
+                    var previousCoinAmount = _previousEvent?.CoinAmounts?.FirstOrDefault(c => c.CoinId == coinAmount.Key);
+
+                    var currentCoinAmount = new CoinAmount()
+                    {
+                        CoinId = coinAmount.Key,
+                        Amount = coinAmount.Value,
+                        Value = foundMovement == null ? 0 : foundMovement.Amount * coinAmount.Value
+                    };
+
+                    if(previousCoinAmount != currentCoinAmount)
+                    {
+                        coinAmounts.Add(currentCoinAmount);
+                    }
+                }
+
+
                 // Generate Event for tick
                 GenerateEventsForTicks(newEvents, coinData);
 
@@ -143,6 +164,7 @@ namespace ImminentCrash.Server.Services
                     RemoveCoins = null,
                     NewLivingCosts = newLivingCosts.Any() ? newLivingCosts : null,
                     NewEvents = newEvents.Any() ? newEvents : null,
+                    CoinAmounts = coinAmounts.Any() ? coinAmounts : null
                 };
 
                 // Send Game Event
@@ -330,11 +352,11 @@ namespace ImminentCrash.Server.Services
 
             foreach (CoinBuyOrder buyOrder in buyOrders)
             {
-                if (_coinOwnage.ContainsKey(buyOrder.CoinMovement.Id) == false)
+                if (_coinAmounts.ContainsKey(buyOrder.CoinMovement.Id) == false)
                 {
-                    _coinOwnage.Add(buyOrder.CoinMovement.Id, 0);
+                    _coinAmounts.Add(buyOrder.CoinMovement.Id, 0);
                 }
-                _coinOwnage[buyOrder.CoinMovement.Id] += buyOrder.Amount;
+                _coinAmounts[buyOrder.CoinMovement.Id] += buyOrder.Amount;
 
                 balanceMovement.Add(new BalanceMovement
                 {
@@ -350,13 +372,13 @@ namespace ImminentCrash.Server.Services
             _coinSellOrders.Clear();
             foreach (CoinSellOrder? sellOrder in sellOrders)
             {
-                if (_coinOwnage.ContainsKey(sellOrder.CoinMovement.Id) == false || _coinOwnage[sellOrder.CoinMovement.Id] < sellOrder.Amount)
+                if (_coinAmounts.ContainsKey(sellOrder.CoinMovement.Id) == false || _coinAmounts[sellOrder.CoinMovement.Id] < sellOrder.Amount)
                 {
                     continue;
                 }
 
                 decimal price = sellOrder.CoinMovement.Amount * sellOrder.Amount;
-                _coinOwnage[sellOrder.CoinMovement.Id] -= sellOrder.Amount;
+                _coinAmounts[sellOrder.CoinMovement.Id] -= sellOrder.Amount;
 
                 balanceMovement.Add(new BalanceMovement
                 {
