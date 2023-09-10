@@ -46,6 +46,12 @@
 
         <h1 style="margin-bottom:20px;">@(_isDead ? "You went bankrupt" : "You won, you're now officialy a crypto bro!")</h1>
 
+        @if (_highscoreResponse is not null)
+        {
+            <p>You lasted @_highscoreResponse.DaysAlive days!</p>
+            <p>Your Highest Balance was $@_highscoreResponse.HighestBalance.ToString("#,##0.00")</p>
+        }
+
         <label for="highscore-name">Enter your name below</label>
         <input id="highscore-name" type="text" class="input" @bind-value="@_highScoreName" placeholder="Type your name here"/>
 

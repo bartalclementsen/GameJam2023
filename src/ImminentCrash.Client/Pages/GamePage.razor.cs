@@ -31,6 +31,8 @@ public partial class GamePage
 
     private string _highScoreName = default!;
 
+    private HighscoreResponse? _highscoreResponse;
+
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     private EventOverviewComponent EventOverviewComponentRef = default!;
@@ -98,7 +100,7 @@ public partial class GamePage
             {
                 Logger.LogInformation(gameEvent.ToString());
 
-                HandleEvent(gameEvent);
+                await HandleEvent(gameEvent);
 
                 if (gameEvent.IsDead)
                 {
@@ -120,7 +122,7 @@ public partial class GamePage
         }
     }
 
-    private void HandleEvent(GameEvent gameEvent)
+    private async Task HandleEvent(GameEvent gameEvent)
     {
         EventOverviewComponentRef.HandleNewGameEvent(gameEvent);
         CoinOverviewComponentRef.HandleNewGameEvent(gameEvent);
@@ -136,7 +138,14 @@ public partial class GamePage
             _isWinner = true;
 
         if(_isDead || _isWinner)
+        {
+            _highscoreResponse = await Client.GetHighscoreAsync(new GetHighscoreRequest()
+            {
+                SessionId = SessionId
+            });
+
             StateHasChanged();
+        }
     }
 
     private async void OnQuitGameClicked()
