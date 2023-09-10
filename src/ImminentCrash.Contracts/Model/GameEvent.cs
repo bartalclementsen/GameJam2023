@@ -40,6 +40,9 @@ public record GameEvent
 
     [DataMember(Order = 12)]
     public IEnumerable<LivingCost>? ChangedLivingCosts { get; init; }
+
+    [DataMember(Order = 13)]
+    public bool IsWinner { get; init; }
 }
 
 [DataContract]

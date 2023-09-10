@@ -1,5 +1,81 @@
 ﻿@page "/HighScore"
 
-<h3>HighScorePage</h3>
 
-<button @onclick="() => OnBackClicked()">Back</button>
+<div style="display:flex;flex-direction:column;width:100vw;height:100vh;justify-content:center;align-items:center;background-color:orange;">
+    <h1 style="text-align: center;font-family: Montserrat;font-size: 6em;text-shadow: 3px 3px 2px rgba(128, 0, 0, 1),9px 9px 12px rgba(38, 0, 128, 1);">
+        HighScores
+    </h1>
+
+    <button style="background-color: rosybrown;color:white;border-radius: 1em;padding: 1em;margin: 1em;width: 10em;" @onclick="@((e) => _showWinners = !_showWinners)">
+        @($"{(_showWinners == true ? "Show loosers" : "Show winners")}")
+    </button>
+
+    <div style="width:auto;min-width:40vw;min-height:40vh;padding:1em;border: 1px solid black;border-radius:15px;background-color:white;">
+        @if (_showWinners)
+        {
+            <div>
+                <h3>Players that went to the moon</h3>
+                <table width="100%">
+                    <tr>
+                        <th>Name</th>
+                        <th>Days Alive</th>
+                        <th>Highest Balance</th>
+                        <th>Date</th>
+                    </tr>
+                    @if (_winningHighscores is not null)
+                    {
+                            @foreach (var highscore in _winningHighscores)
+                            {
+                                <tr style="color:green;">
+                                    <td>@(highscore.Name)</td>
+                                    <td>@(highscore.DaysAlive)</td>
+                                    <td>@(highscore.HighestBalance)</td>
+                                    <td>@highscore.HighscoreDate.ToString("dd.mm.yyyy HH:mm")</td>
+                                </tr>
+                            }                        
+
+                    }
+                </table>
+                @if (_winningHighscores is null || _winningHighscores.Any() == false)
+                {
+                    <h1>no data available yet!</h1>
+                }
+            </div>            
+        }
+
+        @if (_showWinners == false)
+        {
+            <div>
+                <h3>Players that went crashing down</h3>
+                <table width="100%">
+                    <tr>
+                        <th>Name</th>
+                        <th>Days Alive</th>
+                        <th>Highest Balance</th>
+                        <th>Date</th>
+                    </tr>
+                    @if (_loosingHighscores is not null)
+                    {
+                        @foreach (var highscore in _loosingHighscores)
+                        {
+                            <tr style="color:red;">
+                                <td>@(highscore.Name)</td>
+                                <td>@(highscore.DaysAlive)</td>
+                                <td>@(highscore.HighestBalance)</td>
+                                <td>@highscore.HighscoreDate.ToString("dd.mm.yyyy HH:mm")</td>
+                            </tr>
+                        }
+
+                    }
+                </table>
+                @if (_loosingHighscores is null || _loosingHighscores.Any() == false)
+                {
+                    <h1>no data available yet!</h1>
+                }
+            </div>            
+        }
+    </div>
+    <button style="background-color: rosybrown;color:white;border-radius: 1em;padding: 1em;margin: 1em;width: 10em;" @onclick="() => OnBackClicked()">
+        Back
+    </button>
+</div>

@@ -12,6 +12,7 @@ IServiceCollection services = builder.Services;
 
 services.AddSingleton<IGameService, GameService>();
 services.AddSingleton<ICoinDataService, CoinDataService>();
+services.AddSingleton<IHighscoreService, HighscoreService>();
 services.AddTransient<GameSession>();
 services.AddSingleton<Func<GameSession>>((s) => s.GetRequiredService<GameSession>);
 

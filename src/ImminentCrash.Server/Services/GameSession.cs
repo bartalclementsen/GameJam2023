@@ -20,6 +20,8 @@ namespace ImminentCrash.Server.Services
         Task SellCoinsAsync(SellCoinRequest request, CancellationToken cancellationToken);
 
         Task BuyCoinsAsync(BuyCoinsRequest request, CancellationToken cancellationToken);
+
+        Task<HighscoreResponse> GetHighscoreAsync(CancellationToken cancellationToken);
     }
 
     public class GameSession : IGameSession
@@ -132,6 +134,9 @@ namespace ImminentCrash.Server.Services
                     }
                 }
 
+                if (_gameSessionState.CurrentBalance > _gameSessionState.HighestBalance)
+                    _gameSessionState.HighestBalance = _gameSessionState.CurrentBalance;
+
                 // Apply cost
                 _gameSessionState.CurrentBalance += balanceMovement.Sum(o => o.Amount);
 
@@ -184,7 +189,8 @@ namespace ImminentCrash.Server.Services
                     RemoveLivingCosts = null,
                     ChangedLivingCosts = changedLivingCosts.Any() ? changedLivingCosts : null,
                     NewEvents = newEvents.Any() ? newEvents : null,
-                    CoinAmounts = coinAmounts.Any() ? coinAmounts : null
+                    CoinAmounts = coinAmounts.Any() ? coinAmounts : null,
+                    IsWinner = _currentDate >= _endDate
                 };
 
                 // Send Game Event
@@ -193,10 +199,8 @@ namespace ImminentCrash.Server.Services
                 _events.Add(_currentDate, gameEvent);
                 _previousEvent = gameEvent;
 
-                if (_gameSessionState.IsDead)
-                {
+                if (_gameSessionState.IsDead || gameEvent.IsWinner)
                     break;  // Stop the loop
-                }
             }
         }
 
@@ -630,6 +634,17 @@ namespace ImminentCrash.Server.Services
             return Task.CompletedTask;
         }
 
+        public Task<HighscoreResponse> GetHighscoreAsync(CancellationToken cancellationToken)
+        {
+            return Task.FromResult(new HighscoreResponse()
+            {
+                DaysAlive = (_currentDate.ToDateTime(new TimeOnly(12)) - _startDate.ToDateTime(new TimeOnly(12))).Days,
+                CurrentBalance = _gameSessionState.CurrentBalance,
+                HighestBalance = _gameSessionState.HighestBalance,
+                IsDead = _gameSessionState.IsDead
+            });
+        }
+
         public record CoinBuyOrder(CoinMovement CoinMovement, int Amount, decimal Price);
 
         public record CoinSellOrder(CoinMovement CoinMovement, int Amount);
@@ -641,5 +656,7 @@ namespace ImminentCrash.Server.Services
         public bool IsDead => CurrentBalance < 0;
 
         public decimal CurrentBalance { get; set; }
+
+        public decimal HighestBalance { get; set; }
     }
 }
