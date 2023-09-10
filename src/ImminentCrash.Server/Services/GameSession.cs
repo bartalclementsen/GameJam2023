@@ -120,11 +120,20 @@ namespace ImminentCrash.Server.Services
                     CoinMovement? foundMovement = coinMovements.FirstOrDefault(c => c.Id == coinAmount.Key);
                     var previousCoinAmount = _previousEvent?.CoinAmounts?.FirstOrDefault(c => c.CoinId == coinAmount.Key);
 
+                    Random gen = new Random();
+                    int prob = gen.Next(100);
+                    int numberOfCoins = coinAmount.Value;
+                    if (prob < coinAmount.Value)
+                    {
+                        numberOfCoins += 1;
+                        _coinAmounts[coinAmount.Key] += 1;
+                    }
+
                     var currentCoinAmount = new CoinAmount()
                     {
                         CoinId = coinAmount.Key,
-                        Amount = coinAmount.Value,
-                        Value = foundMovement == null ? 0 : foundMovement.Amount * coinAmount.Value
+                        Amount = numberOfCoins,
+                        Value = foundMovement == null ? 0 : foundMovement.Amount * numberOfCoins
                     };
 
                     if(previousCoinAmount != currentCoinAmount)
@@ -400,7 +409,7 @@ namespace ImminentCrash.Server.Services
 
             if (daysDifference == 25)
             {
-                newEvents.Add(new Event() { Title = "Message from Ex-Girlfriend!", Details = $"I'm pragnant! You need to buy diapers. They cost £500 dollars a week." });
+                newEvents.Add(new Event() { Title = "Message from Ex-Girlfriend!", Details = $"I'm pregnant! You need to buy diapers. They cost £500 dollars a week." });
                 LivingCost car = new()
                 {
                     Amount = 2000,
