@@ -35,6 +35,9 @@
                 Events.Remove(livingCost);
             }
         }
-        StateHasChanged();
+        if (gameEvent.NewLivingCosts != null || gameEvent.RemoveLivingCosts != null)
+        {
+            StateHasChanged();
+        }
     }
 }
