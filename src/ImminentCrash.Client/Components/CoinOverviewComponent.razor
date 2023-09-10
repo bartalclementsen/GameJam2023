@@ -129,7 +129,15 @@
                 Amount = amount
             });
         }
-        await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "buyAudio");
+        
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "buyAudio");
+        }
+        catch
+        {
+
+        }
     }
 
     private async void Sell(DataItem coin, int amount)
@@ -151,7 +159,15 @@
                 Amount = amount
             });
         }
-        await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "buyAudio");
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("audioFunctions.playAudio", "buyAudio");
+        }
+        catch
+        {
+            
+        }
+
 
     }
 
