@@ -83,6 +83,7 @@ namespace ImminentCrash.Server.Services
 
                 List<BalanceMovement> balanceMovement = new();
                 List<LivingCost> newLivingCosts = new();
+                List<LivingCost> changedLivingCosts = new(); 
                 List<CoinMovement> coinMovements = new();
                 List<Contracts.Model.Coin> newCoins = new();
                 List<Event> newEvents = new List<Event>();
@@ -97,7 +98,7 @@ namespace ImminentCrash.Server.Services
                 _currentDate = _currentDate.AddDays(1);
 
                 // Get living costs
-                GenerateLivingCostForTicks(newLivingCosts);
+                GenerateLivingCostForTicks(newLivingCosts, changedLivingCosts);
 
                 int daysDifference = _currentDate.DayNumber - _startDate.DayNumber;
                 // Generate costs for tick
@@ -180,6 +181,8 @@ namespace ImminentCrash.Server.Services
                     NewCoins = newCoins.Any() ? newCoins : null,
                     RemoveCoins = null,
                     NewLivingCosts = newLivingCosts.Any() ? newLivingCosts : null,
+                    RemoveLivingCosts = null,
+                    ChangedLivingCosts = changedLivingCosts.Any() ? changedLivingCosts : null,
                     NewEvents = newEvents.Any() ? newEvents : null,
                     CoinAmounts = coinAmounts.Any() ? coinAmounts : null
                 };
@@ -362,8 +365,10 @@ namespace ImminentCrash.Server.Services
             //}
         }
 
-        private void GenerateLivingCostForTicks(List<LivingCost> newLivingCosts)
+        private void GenerateLivingCostForTicks(List<LivingCost> newLivingCosts, List<LivingCost> changedLivingCosts)
         {
+            int daysDifference = _currentDate.DayNumber - _startDate.DayNumber;
+
             LivingCost daily = new()
             {
                 Amount = 100,
@@ -378,13 +383,21 @@ namespace ImminentCrash.Server.Services
                 Name = "Car payments"
             };
 
-            if (livingCosts.Contains(daily) == false)
+            if (livingCosts.Any(lc => lc.Name == "Daily costs") == false)
             {
                 newLivingCosts.Add(daily);
                 livingCosts.Add(daily);
             }
+            else if (daysDifference % 7 == 0)
+            {
+                LivingCost tempDaily = livingCosts.First(lc => lc.Name == daily.Name);
+                tempDaily = tempDaily with { Amount = decimal.Multiply(tempDaily.Amount, 1.1m) };
+                livingCosts.RemoveAll(lc => lc.Name == daily.Name);
+                livingCosts.Add(tempDaily);
+                changedLivingCosts.Add(tempDaily);
+            }
 
-            if (livingCosts.Contains(car) == false)
+            if (livingCosts.Any(lc => lc.Name == "Car payments") == false)
             {
                 newLivingCosts.Add(car);
                 livingCosts.Add(car);

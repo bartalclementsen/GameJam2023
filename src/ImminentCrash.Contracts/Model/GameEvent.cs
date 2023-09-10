@@ -37,6 +37,9 @@ public record GameEvent
 
     [DataMember(Order = 11)]
     public IEnumerable<CoinAmount>? CoinAmounts { get; init; }
+
+    [DataMember(Order = 12)]
+    public IEnumerable<LivingCost>? ChangedLivingCosts { get; init; }
 }
 
 [DataContract]
