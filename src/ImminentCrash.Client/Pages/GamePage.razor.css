@@ -169,7 +169,6 @@
     padding: 2em;
     margin: 1em;
     color: white;
-    width: 50%;
 }
 
 .death-dialog__window .button {
@@ -179,5 +178,4 @@
     border-radius: 1em;
     padding: 1em;
     margin: 1em;
-    width: 50%;
 }

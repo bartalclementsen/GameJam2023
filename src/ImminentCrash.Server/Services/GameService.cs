@@ -27,6 +27,7 @@ namespace ImminentCrash.Server.Services
         Task CreateHighscoreAsync(CreateHighscoreRequest createHighscoreRequest, CallContext callContext);
 
         Task<GetTopHighscoresResponse> GetTopHighscoresAsync(GetTopHighscoresRequest getTopHighscoresRequest, CallContext callContext);
+        Task<HighscoreResponse> GetHighscoreAsync(GetHighscoreRequest request, CallContext callContext);
     }
 
     public class GameService : IGameService
@@ -118,6 +119,20 @@ namespace ImminentCrash.Server.Services
         {
             IGameSession gameSession = GetGameSessionByIdOrThrow(request.SessionId);
             await _highscoreService.CreateHighscoreAsync(request, gameSession, callContext.CancellationToken);
+        }
+
+        public async Task<HighscoreResponse> GetHighscoreAsync(GetHighscoreRequest request, CallContext callContext)
+        {
+            IGameSession gameSession = GetGameSessionByIdOrThrow(request.SessionId);
+            var highscore = await gameSession.GetHighscoreAsync(callContext.CancellationToken);
+
+            return new HighscoreResponse()
+            {
+                DaysAlive = highscore.DaysAlive,
+                HighestBalance = highscore.HighestBalance,
+                CurrentBalance = highscore.CurrentBalance,
+                IsDead = highscore.IsDead
+            };
         }
 
         public async Task<GetTopHighscoresResponse> GetTopHighscoresAsync(GetTopHighscoresRequest request, CallContext callContext)

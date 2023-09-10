@@ -32,6 +32,9 @@ namespace ImminentCrash.Contracts
         Task CreateHighscoreAsync(CreateHighscoreRequest createHighscoreRequest, CallContext context = default);
 
         [OperationContract]
+        Task<HighscoreResponse> GetHighscoreAsync(GetHighscoreRequest getHighscoreRequest, CallContext context = default);
+
+        [OperationContract]
         Task<GetTopHighscoresResponse> GetTopHighscoresAsync(GetTopHighscoresRequest getTopHighscoresRequest, CallContext context = default);
     }
 }

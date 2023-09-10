@@ -52,14 +52,19 @@ namespace ImminentCrash.Server.Services
             return _gameService.BuyCoinsAsync(request, context);
         }
 
-        public Task CreateHighscoreAsync(CreateHighscoreRequest createHighscoreRequest, CallContext context = default)
+        public Task CreateHighscoreAsync(CreateHighscoreRequest request, CallContext context = default)
         {
-            return _gameService.CreateHighscoreAsync(createHighscoreRequest, context);
+            return _gameService.CreateHighscoreAsync(request, context);
         }
 
-        public Task<GetTopHighscoresResponse> GetTopHighscoresAsync(GetTopHighscoresRequest getTopHighscoresRequest, CallContext context = default)
+        public Task<GetTopHighscoresResponse> GetTopHighscoresAsync(GetTopHighscoresRequest request, CallContext context = default)
         {
-            return _gameService.GetTopHighscoresAsync(getTopHighscoresRequest, context);
+            return _gameService.GetTopHighscoresAsync(request, context);
+        }
+
+        public Task<HighscoreResponse> GetHighscoreAsync(GetHighscoreRequest request, CallContext context = default)
+        {
+            return _gameService.GetHighscoreAsync(request, context.CancellationToken);
         }
     }
 }
