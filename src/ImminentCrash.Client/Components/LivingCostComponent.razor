@@ -49,8 +49,10 @@
             }
         }
 
-
-        StateHasChanged();
+        if (gameEvent.NewLivingCosts != null || gameEvent.RemoveLivingCosts != null)
+        {
+            StateHasChanged();
+        }
     }
 
     private class DataItem

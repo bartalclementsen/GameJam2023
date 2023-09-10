@@ -2,7 +2,7 @@
     <h3>Balance</h3>
 
     <div>
-        <span style="font-size: xxx-large;">$ @_bankBalance</span>
+        <span style="font-size: 3em;">$@_bankBalance.ToString("#,##0.00")</span>
         <span style="border: 1px solid #000000; border-radius: 8px; padding: 3px;background-color: @($"{(_change > 0 ? "green" : "red")}");padding: 1em;">@_change</span>
     </div>
 </div>
