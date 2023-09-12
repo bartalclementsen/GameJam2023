@@ -14,7 +14,7 @@ public partial class HighScorePage
 
     private List<HighscoreResponse>? _loosingHighscores;
 
-    private bool _showWinners = true;
+    private bool _showWinners = false;
 
     protected override async Task OnInitializedAsync()
     {

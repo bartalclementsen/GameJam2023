@@ -72,6 +72,8 @@ public partial class GamePage
         Logger.LogInformation("Trying to start game");
 
         await base.OnInitializedAsync();
+
+        await JSRuntime.InvokeVoidAsync("audioFunctions.setVolumeOnLoad", "mainSong", "0.1");
     }
 
     protected virtual void Dispose(bool disposing)

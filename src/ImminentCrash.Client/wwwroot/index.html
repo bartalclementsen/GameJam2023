@@ -57,7 +57,17 @@
                 if (audioElement) {
                     audioElement.volume = volume;
                 }
+            },
+            setVolumeOnLoad: function (audioElementId, volume) {
+                var audioElement = document.getElementById(audioElementId);
+                if (audioElement) {
+                    audioElement.volume = volume;
+                    audioElement.addEventListener("play", function () {
+                        audioElement.volume = volume;
+                    });
+                }
             }
+
         };
     </script>
 </body>
